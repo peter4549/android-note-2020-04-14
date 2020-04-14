@@ -1,7 +1,11 @@
 package com.android.java.room;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     private static boolean initialization;
     private EditNoteFragment editNoteFragment;
+    private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +38,12 @@ public class MainActivity extends AppCompatActivity {
         editText = findViewById(R.id.edit_text);
         editNoteFragment = new EditNoteFragment();
 
-        final AppDatabase database = Room.databaseBuilder(this, AppDatabase.class,
-                "note_database").build();
+        // https://themach.tistory.com/42
+        if(viewModelFactory == null){
+            viewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
+        }
+
+        final MainViewModel viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
 
         final RecyclerView recyclerView;
         recyclerView = findViewById(R.id.recycler_view);
@@ -45,13 +54,12 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new InsertAsyncTask(database.noteDao())
-                        .execute(new Note(getDate(), editText.getText().toString()));
+                viewModel.insert(new Note(getDate(), editText.getText().toString()));
                 editText.setText(null);
             }
         });
 
-        database.noteDao().getAll().observe(this, new Observer<List<Note>>() {
+        viewModel.getAll().observe(this, new Observer<List<Note>>() {
             RecyclerView.Adapter adapter;
             @Override
             public void onChanged(List<Note> notes) {
@@ -65,20 +73,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private static class InsertAsyncTask extends AsyncTask<Note, Void, Void> {
-        private NoteDao noteDao;
-
-        InsertAsyncTask(NoteDao noteDao) {
-            this.noteDao = noteDao;
-        }
-
-        @Override
-        protected Void doInBackground(Note... notes) {
-            noteDao.insert(notes[0]);
-            return null;
-        }
     }
 
     public String getDate() {
