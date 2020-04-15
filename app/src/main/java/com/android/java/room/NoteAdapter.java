@@ -1,7 +1,6 @@
 package com.android.java.room;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,42 +8,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.java.room.databinding.CardViewBinding;
 
 import java.util.List;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> notes;
     private final Context context;
-    private int position;
 
     public NoteAdapter(List<Note> notes, Context context) {
         this.notes = notes;
         this.context = context;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
     public class NoteViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener{
-        CardView cardView;
-        TextView textViewNumber;
-        TextView textViewDate;
-        TextView textViewNote;
+        CardViewBinding binding;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.card_view);
-            textViewNumber = itemView.findViewById(R.id.text_view_number);
-            textViewDate = itemView.findViewById(R.id.text_view_date);
-            textViewNote = itemView.findViewById(R.id.text_view_note);
+            binding = CardViewBinding.bind(itemView);
             itemView.setOnCreateContextMenuListener(this);
         }
 
@@ -84,24 +71,26 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public NoteAdapter.NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view, parent, false);
+
         return new NoteViewHolder(linearLayout);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, final int position) {
-        Note newsData = notes.get(position);
-        holder.textViewNumber.setText("No. " + newsData.getNumber());
-        holder.textViewDate.setText(newsData.getDate());
-        holder.textViewNote.setText(newsData.getNote());
+        Note note = notes.get(position);
+        String numberDisplay = "No. " + note.getNumber();
+        holder.binding.textViewNumber.setText(numberDisplay);
+        holder.binding.textViewDate.setText(note.getDate());
+        holder.binding.textViewNote.setText(note.getNote());
 
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.binding.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((MainActivity) context).onFragmentChanged(0, notes.get(position));
             }
         });
 
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.binding.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 return false;

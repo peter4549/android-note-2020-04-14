@@ -1,56 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".MainActivity">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_gravity="center"
+    <data>
+        <variable
+            name="note"
+            type="com.android.java.room.Note" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="128dp"
-        card_view:cardCornerRadius="8dp"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_height="wrap_content"
+        tools:context=".MainActivity">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="128dp"
+            card_view:cardCornerRadius="8dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true" >
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:orientation="horizontal"
-                android:background="@color/colorPrimary">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal"
+                    android:background="@color/colorPrimary">
+
+                    <TextView
+                        android:id="@+id/text_view_number"
+                        android:layout_width="64dp"
+                        android:layout_height="match_parent"
+                        android:textColor="#ffffff" />
+
+                    <TextView
+                        android:id="@+id/text_view_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:textColor="#ffffff" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/text_view_number"
-                    android:layout_width="64dp"
-                    android:layout_height="match_parent"
-                    android:textColor="#ffffff" />
-
-                <TextView
-                    android:id="@+id/text_view_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:textColor="#ffffff" />
+                    android:id="@+id/text_view_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp"
+                    android:background="?attr/selectableItemBackground"/>
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/text_view_note"
-                android:layout_width="match_parent"
-                android:layout_height="96dp" />
+        </androidx.cardview.widget.CardView>
 
-        </LinearLayout>
+    </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
-
-</LinearLayout>
+</layout>

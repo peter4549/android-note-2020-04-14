@@ -1,29 +1,22 @@
 package com.android.java.room;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStore;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+
+import com.android.java.room.databinding.ActivityMainBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    EditText editText;
     private static boolean initialization;
     private EditNoteFragment editNoteFragment;
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
@@ -32,10 +25,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         initialization = true;
-        editText = findViewById(R.id.edit_text);
         editNoteFragment = new EditNoteFragment();
 
         // https://themach.tistory.com/42
@@ -44,17 +36,15 @@ public class MainActivity extends AppCompatActivity {
         }
         viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
 
-        final RecyclerView recyclerView;
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        binding.recyclerView.setLayoutManager(layoutManager);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.insert(new Note(getDate(), editText.getText().toString()));
-                editText.setText(null);
+                viewModel.insert(new Note(getDate(), binding.editText.getText().toString()));
+                binding.editText.setText(null);
             }
         });
 
@@ -66,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(List<Note> notes) {
                 if (initialization) {
                     adapter = new NoteAdapter(notes, MainActivity.this);
-                    recyclerView.setAdapter(adapter);
+                    binding.recyclerView.setAdapter(adapter);
                     initialization = false;
                 } else if (notesSize < notes.size()) {
                     ((NoteAdapter)adapter).insert(notes.get(notes.size() - 1));
-                    recyclerView.setAdapter(adapter);
+                    binding.recyclerView.setAdapter(adapter);
                 }
                 notesSize = notes.size();
             }
