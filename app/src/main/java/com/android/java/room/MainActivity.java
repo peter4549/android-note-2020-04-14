@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getAll().observe(this, new Observer<List<Note>>() {
             RecyclerView.Adapter adapter;
+            int notesSize;
 
             @Override
             public void onChanged(List<Note> notes) {
@@ -67,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
                     adapter = new NoteAdapter(notes, MainActivity.this);
                     recyclerView.setAdapter(adapter);
                     initialization = false;
-                } else {
-                    ((NoteAdapter)adapter).insert(notes);
+                } else if (notesSize < notes.size()) {
+                    ((NoteAdapter)adapter).insert(notes.get(notes.size() - 1));
+                    recyclerView.setAdapter(adapter);
                 }
+                notesSize = notes.size();
             }
         });
     }

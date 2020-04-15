@@ -1,6 +1,7 @@
 package com.android.java.room;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,13 +114,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return notes == null ? 0 : notes.size();
     }
 
-    public void insert(List<Note> notes) {
-        for (Note note : notes) {
-            if(!this.notes.contains(note)) {
-                this.notes.add(note);
-                notifyItemInserted(this.notes.size() - 1);
-            }
-        }
+    public void insert(Note note) {
+        this.notes.add(note);
+        notifyItemInserted(this.notes.size() - 1);
     }
 
     public void delete(int position) {
