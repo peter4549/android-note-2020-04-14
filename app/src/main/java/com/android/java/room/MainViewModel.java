@@ -24,6 +24,10 @@ public class MainViewModel extends AndroidViewModel {
         return database.noteDao().getAll();
     }
 
+    public Note getNoteFromNumber(int number) {
+        return database.noteDao().getNoteFromNumber(number);
+    }
+
     public void insert(Note note) {
         new InsertAsyncTask(database.noteDao()).execute(note);
     }
@@ -38,6 +42,26 @@ public class MainViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(Note... notes) {
             noteDao.insert(notes[0]);
+            return null;
+        }
+    }
+
+    public void delete(int number) {
+        new DeleteAsyncTask(database.noteDao(), number).execute();
+    }
+
+    private static class DeleteAsyncTask extends AsyncTask<Note, Void, Void> {
+        private NoteDao noteDao;
+        private int number;
+
+        DeleteAsyncTask(NoteDao noteDao, int number) {
+            this.noteDao = noteDao;
+            this.number = number;
+        }
+
+        @Override
+        protected Void doInBackground(Note... notes) {
+            noteDao.delete(noteDao.getNoteFromNumber(number));
             return null;
         }
     }

@@ -23,11 +23,11 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    List<Note> notes;
     EditText editText;
     private static boolean initialization;
     private EditNoteFragment editNoteFragment;
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
         if(viewModelFactory == null){
             viewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
         }
-
-        final MainViewModel viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
 
         final RecyclerView recyclerView;
         recyclerView = findViewById(R.id.recycler_view);
@@ -61,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getAll().observe(this, new Observer<List<Note>>() {
             RecyclerView.Adapter adapter;
+
             @Override
             public void onChanged(List<Note> notes) {
                 if (initialization) {
@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                     initialization = false;
                 } else {
                     ((NoteAdapter)adapter).insert(notes);
-                    recyclerView.setAdapter(adapter);
                 }
             }
         });
@@ -88,5 +87,9 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().addToBackStack(null)
                 .replace(R.id.container, editNoteFragment).commit();
         }
+    }
+
+    public void onItemDelete(int number) {
+        viewModel.delete(number);
     }
 }
