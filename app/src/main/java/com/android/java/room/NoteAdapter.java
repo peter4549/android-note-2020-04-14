@@ -50,7 +50,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case 1001:
-                        ((MainActivity) context).onFragmentChanged(0, notes.get(getAdapterPosition()));
+                        ((MainActivity) context).onEditNoteFragmentStart(notes.get(getAdapterPosition()));
                         break;
                     case 1002:
 
@@ -78,15 +78,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, final int position) {
         Note note = notes.get(position);
-        String numberDisplay = "No. " + note.getNumber();
-        holder.binding.textViewNumber.setText(numberDisplay);
-        holder.binding.textViewDate.setText(note.getDate());
-        holder.binding.textViewNote.setText(note.getNote());
+        holder.binding.textViewTitle.setText(note.getTitle());
+        holder.binding.textViewDate.setText(note.getDateEdit());
 
         holder.binding.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) context).onFragmentChanged(0, notes.get(position));
+                ((MainActivity) context).onEditNoteFragmentStart(notes.get(position));
             }
         });
 

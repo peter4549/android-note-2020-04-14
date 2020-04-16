@@ -21,7 +21,7 @@ public class EditNoteFragment extends Fragment {
 
     public void setEditNote(Note note) {
         this.number = note.getNumber() + "";
-        this.date = note.getDate();
+        this.date = note.getDateAdd();
         this.note = note.getNote();
     }
 

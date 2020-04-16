@@ -7,12 +7,40 @@ import androidx.room.PrimaryKey;
 public class Note {
     @PrimaryKey(autoGenerate = true)
     private int number;
-    private String date;
+    private String title;
+    private String dateAdd;
+    private String dateEdit;
     private String note;
 
-    public Note(String date, String note) {
-        this.date = date;
+    public Note(String title, String dateAdd, String dateEdit, String note) {
+        this.title = title;
+        this.dateAdd = dateAdd;
+        this.dateEdit = dateEdit;
         this.note = note;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDateAdd() {
+        return dateAdd;
+    }
+
+    public void setDateAdd(String dateAdd) {
+        this.dateAdd = dateAdd;
+    }
+
+    public String getDateEdit() {
+        return dateEdit;
+    }
+
+    public void setDateEdit(String dateEdit) {
+        this.dateEdit = dateEdit;
     }
 
     public int getNumber() {
@@ -21,14 +49,6 @@ public class Note {
 
     public void setNumber(int number) {
         this.number = number;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public String getNote() {
@@ -42,7 +62,10 @@ public class Note {
     @Override
     public String toString() {
         return "Note{" +
-                "date='" + date + '\'' +
+                "number=" + number +
+                ", title='" + title + '\'' +
+                ", dateAdd='" + dateAdd + '\'' +
+                ", dateEdit='" + dateEdit + '\'' +
                 ", note='" + note + '\'' +
                 '}';
     }

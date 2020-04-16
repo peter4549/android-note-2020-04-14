@@ -3,4 +3,9 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="colorLime50">#f9fbe7</color>
+    <color name="colorLightBlue50">#e1f5fe</color>
+    <color name="colorAmber50">#fff8e1</color>
+    <color name="colorJuniperAlpha20">#33689C97</color>
+    <color name="colorCeruleanAlpha10">#1A1D6A96</color>
 </resources>
