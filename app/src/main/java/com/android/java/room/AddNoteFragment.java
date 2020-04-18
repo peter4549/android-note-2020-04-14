@@ -1,15 +1,17 @@
 package com.android.java.room;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,34 +21,25 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.android.java.room.databinding.FragmentAddNoteBinding;
-import com.google.android.material.snackbar.Snackbar;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class AddNoteFragment extends Fragment {
-
-    static boolean isAddNoteFragment;
     private MainActivity activity;
     private ActionBar actionBar;
     private FragmentAddNoteBinding binding;
     private Note note;
     private AlertDialog.Builder builder;
-
-    public AddNoteFragment() {
-
-    }
+    static boolean contentAdded;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         activity = ((MainActivity)context);
         builder = new AlertDialog.Builder(context);
-        isAddNoteFragment = true;
+        MainActivity.isFragment = true;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_note,
                 container, false);
@@ -54,14 +47,36 @@ public class AddNoteFragment extends Fragment {
         actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle("새 노트");
         actionBar.setDisplayHomeAsUpEnabled(true);
+        contentAdded = false;
+
+        binding.editTextContent.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged (CharSequence s,int start, int before, int count){
+                contentAdded = count > 0;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         return binding.getRoot();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        isAddNoteFragment = false;
+    public void onStop() {
+        super.onStop();
+        contentAdded = false;
+        MainActivity.isFragment = false;
+        binding.editTextTitle.setText(null);
+        binding.editTextContent.setText(null);
         actionBar.setTitle("클로버 노트");
     }
 
@@ -75,27 +90,32 @@ public class AddNoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                activity.originalOnBackPressed();
+                if (contentAdded)
+                    showCheckMessage();
+                else {
+                    Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    activity.originalOnBackPressed();
+                }
                 break;
             case R.id.save:
-                if (saveNote()) {
+                if (contentAdded) {
+                    saveNote();
                     activity.onAddNote(note);
-
                     activity.originalOnBackPressed();
                 } else {
                     Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_LONG).show();
-
+                    activity.originalOnBackPressed();
                 }
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean saveNote () {
+    private void saveNote () {
         String title = binding.editTextTitle.getText().toString();
-        String content = binding.editTextNote.getText().toString();
+        String content = binding.editTextContent.getText().toString();
         if (title.equals("") && content.equals(""))
-            return false;
+            return;
 
         if (title.equals("")) {
             if(content.length() > 16)
@@ -103,35 +123,40 @@ public class AddNoteFragment extends Fragment {
             else
                 title = content;
         }
-        String date = getDate();
+        String date = activity.getDate();
         note = new Note(title, date, date, content);
-        return true;
-    }
-
-    private String getDate() {
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        return simpleDateFormat.format(date);
     }
 
     public interface OnAddNoteListener {
         public void onAddNote(Note note);
     }
 
-    /*
-    private boolean showCheckMessage() {
-        builder.setMessage("지금까지 작성한 내용을 자장하시겠습니까?").
-                setPositiveButton("저장",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                return true;
-                            }
-                        };
+    public void showCheckMessage() {
+        builder.setTitle("노트 저장");
+        builder.setMessage("지금까지 작성한 내용을 저장하시겠습니까?");
+        builder.setPositiveButton("저장",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        saveNote();
+                        activity.onAddNote(note);
+                        activity.originalOnBackPressed();
+                    }
+                }).setNeutralButton("계속쓰기",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
+                    }
+                });
+
+        builder.setNegativeButton("아니요",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                        activity.originalOnBackPressed();
+                    }
+                });
+        builder.create();
+        builder.show();
     }
-
-     */
 }
 

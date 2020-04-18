@@ -8,4 +8,6 @@
     <color name="colorAmber50">#fff8e1</color>
     <color name="colorJuniperAlpha20">#33689C97</color>
     <color name="colorCeruleanAlpha10">#1A1D6A96</color>
+    <color name="colorBlueGreyDark">#263238</color>
+    <color name="colorYellowActionBar">#fff59d</color>
 </resources>

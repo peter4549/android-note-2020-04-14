@@ -10,13 +10,13 @@ public class Note {
     private String title;
     private String dateAdd;
     private String dateEdit;
-    private String note;
+    private String content;
 
-    public Note(String title, String dateAdd, String dateEdit, String note) {
+    public Note(String title, String dateAdd, String dateEdit, String content) {
         this.title = title;
         this.dateAdd = dateAdd;
         this.dateEdit = dateEdit;
-        this.note = note;
+        this.content = content;
     }
 
     public String getTitle() {
@@ -51,12 +51,12 @@ public class Note {
         this.number = number;
     }
 
-    public String getNote() {
-        return note;
+    public String getContent() {
+        return content;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setContent(String note) {
+        this.content = note;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Note {
                 ", title='" + title + '\'' +
                 ", dateAdd='" + dateAdd + '\'' +
                 ", dateEdit='" + dateEdit + '\'' +
-                ", note='" + note + '\'' +
+                ", content='" + content + '\'' +
                 '}';
     }
 }

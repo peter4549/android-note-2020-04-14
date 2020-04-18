@@ -25,7 +25,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:layout_weight="0.75"
-                android:hint="Write a note." />
+                android:hint="Write a note."
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/button"

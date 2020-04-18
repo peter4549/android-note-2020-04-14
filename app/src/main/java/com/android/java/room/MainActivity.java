@@ -22,8 +22,9 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        AddNoteFragment.OnAddNoteListener{
+        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener{
     private static boolean initialization;
+    static boolean isFragment = false;
 
     private AddNoteFragment addNoteFragment;
     private EditNoteFragment editNoteFragment;
@@ -113,8 +114,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if (AddNoteFragment.isAddNoteFragment) {
-            super.onBackPressed();
+        if (isFragment) {
+            if(AddNoteFragment.contentAdded)
+                addNoteFragment.showCheckMessage();
+            else
+                super.onBackPressed();
         } else {
             if (pressedTime == 0) {
                 Snackbar.make(findViewById(R.id.container),
@@ -141,5 +145,12 @@ public class MainActivity extends AppCompatActivity implements
         this.note = note;
         viewModel.insert(note);
         Toast.makeText(this, "노트가 저장되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEditNote(Note note) {
+        this.note = note;
+        viewModel.update(this.note);
+        Toast.makeText(this, "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
     }
 }

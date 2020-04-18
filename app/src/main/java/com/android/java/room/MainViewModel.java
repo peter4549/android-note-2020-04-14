@@ -11,13 +11,15 @@ import androidx.room.Room;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
-    private final AppDatabase database;
+    private AppDatabase database;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
 
         database = Room.databaseBuilder(application, AppDatabase.class,
-                "note_database").build();
+                "note_database")
+                .fallbackToDestructiveMigration()
+                .build();
     }
 
     public LiveData<List<Note>> getAll() {
@@ -62,6 +64,24 @@ public class MainViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(Note... notes) {
             noteDao.delete(noteDao.getNoteFromNumber(number));
+            return null;
+        }
+    }
+
+    public void update(Note note) {
+        new UpdateAsyncTask(database.noteDao()).execute(note);
+    }
+
+    private static class UpdateAsyncTask extends AsyncTask<Note, Void, Void> {
+        private NoteDao noteDao;
+
+        UpdateAsyncTask(NoteDao noteDao) {
+            this.noteDao = noteDao;
+        }
+
+        @Override
+        protected Void doInBackground(Note... notes) {
+            noteDao.update(notes[0]);
             return null;
         }
     }
