@@ -7,6 +7,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -14,15 +16,50 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.java.room.databinding.CardViewBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder>
+        implements Filterable {
     private List<Note> notes;
+    private List<Note> notesFiltered;
     private final Context context;
 
     public NoteAdapter(List<Note> notes, Context context) {
         this.notes = notes;
+        notesFiltered = notes;
         this.context = context;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String searchWord = constraint.toString();
+                if(searchWord.isEmpty()) {
+                    notesFiltered = notes;
+                } else {
+                    List<Note> notesFiltering = new ArrayList<>();
+                    for(Note note : notes) {
+                        if (note.getTitle().toLowerCase().contains(searchWord.toLowerCase())) {
+                            notesFiltering.add(note);
+                        }
+                    }
+                    notesFiltered = notesFiltering;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = notesFiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                notesFiltered = (List<Note>)results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class NoteViewHolder extends RecyclerView.ViewHolder
@@ -77,14 +114,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, final int position) {
-        Note note = notes.get(position);
+        Note note = notesFiltered.get(position);
         holder.binding.textViewTitle.setText(note.getTitle());
         holder.binding.textViewDate.setText(note.getDateEdit());
 
         holder.binding.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) context).onEditNoteFragmentStart(notes.get(position));
+                ((MainActivity) context).onEditNoteFragmentStart(notesFiltered.get(position));
             }
         });
 
@@ -98,7 +135,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     @Override
     public int getItemCount() {
-        return notes == null ? 0 : notes.size();
+        return notesFiltered == null ? 0 : notesFiltered.size();
     }
 
     public void insert(Note note) {

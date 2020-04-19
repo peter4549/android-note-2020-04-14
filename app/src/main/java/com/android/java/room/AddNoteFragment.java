@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -24,7 +23,6 @@ import com.android.java.room.databinding.FragmentAddNoteBinding;
 
 public class AddNoteFragment extends Fragment {
     private MainActivity activity;
-    private ActionBar actionBar;
     private FragmentAddNoteBinding binding;
     private Note note;
     private AlertDialog.Builder builder;
@@ -44,9 +42,9 @@ public class AddNoteFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_note,
                 container, false);
         setHasOptionsMenu(true);
-        actionBar = ((MainActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle("새 노트");
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        activity.setSupportActionBar(binding.toolBar);
+        binding.toolBar.setTitle("새 노트");
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         contentAdded = false;
 
         binding.editTextContent.addTextChangedListener(new TextWatcher() {
@@ -77,13 +75,11 @@ public class AddNoteFragment extends Fragment {
         MainActivity.isFragment = false;
         binding.editTextTitle.setText(null);
         binding.editTextContent.setText(null);
-        actionBar.setTitle("클로버 노트");
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_add_note,menu);
+        inflater.inflate(R.menu.menu_add_note, menu);
     }
 
     @Override

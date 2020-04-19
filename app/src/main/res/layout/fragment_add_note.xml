@@ -10,10 +10,19 @@
         android:orientation="vertical"
         android:background="@color/colorLightBlue50" >
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tool_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorLightBlue50">
+
+        </androidx.appcompat.widget.Toolbar>
+
         <EditText
             android:id="@+id/editTextTitle"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
+            android:layout_below="@id/tool_bar"
             android:background="@color/colorAmber50"
             android:hint="제목을 입력해주세요." />
 
@@ -22,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/editTextTitle"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:background="@color/colorAmber50"
             android:hint="여기에 노트를 작성해주세요."
             android:gravity="top"/>

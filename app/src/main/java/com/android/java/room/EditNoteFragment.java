@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
@@ -57,9 +54,9 @@ public class EditNoteFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note,
                 container, false);
         setHasOptionsMenu(true);
-
-        actionBar = ((MainActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle(note.getTitle());
+        activity.setSupportActionBar(binding.toolBar);
+        binding.toolBar.setTitle(note.getTitle());
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         binding.editTextContentEdit.addTextChangedListener(new TextWatcher() {
             @Override
@@ -87,18 +84,17 @@ public class EditNoteFragment extends Fragment {
         binding.textViewDateAdd.setText("최초 작성일: " + note.getDateAdd());
         binding.textViewDateEdit.setText("최근 수정일: " + note.getDateEdit());
         binding.editTextContentEdit.setText(note.getContent());
+        binding.editTextContentEdit.setEnabled(false);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         MainActivity.isFragment = false;
-        actionBar.setTitle("클로버 노트");
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_edit_note,menu);
     }
 

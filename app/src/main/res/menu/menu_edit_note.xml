@@ -7,23 +7,12 @@
         android:icon="@drawable/pencil_039be5_240"
         app:showAsAction="always" />
 
-    <item android:id="@+id/context_menu"
-        android:title="context_menu"
-        android:icon="@drawable/menu_vertical_dots_240"
-        app:showAsAction="always" >
+    <item android:id="@+id/menu_edit"
+        android:title="공유하기"
+        app:showAsAction="never"/>
 
-        <menu>
-
-            <item android:id="@+id/menu_edit"
-                android:title="공유하기"
-                app:showAsAction="ifRoom"/>
-
-            <item android:id="@+id/menu_complete_check"
-                android:title="완료체크"
-                app:showAsAction="ifRoom"/>
-
-        </menu>
-
-    </item>>
+    <item android:id="@+id/menu_complete_check"
+        android:title="완료체크"
+        app:showAsAction="never"/>
 
 </menu>

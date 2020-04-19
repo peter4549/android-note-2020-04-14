@@ -1,6 +1,7 @@
 package com.android.java.room;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.android.java.room.databinding.ActivityMainBinding;
 import com.google.android.material.snackbar.Snackbar;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements
     private EditNoteFragment editNoteFragment;
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
+    private static NoteAdapter adapter;
 
     //private OnBackPressedListener onBackPressedListener;
 
@@ -41,7 +44,23 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        // inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        setSupportActionBar(binding.toolBar);
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                Log.d("AAA","BBB");
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                Log.d("ZZZ","CCC");
+                return true;
+            }
+        });
 
         initialization = true;
         editNoteFragment = new EditNoteFragment();
@@ -68,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         viewModel.getAll().observe(this, new Observer<List<Note>>() {
-            RecyclerView.Adapter adapter;
             int notesSize;
 
             @Override
@@ -79,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements
                     initialization = false;
                 } else if (notesSize < notes.size()) {
                     ((NoteAdapter)adapter).insert(notes.get(notes.size() - 1));
-                    binding.recyclerView.setAdapter(adapter);
                 }
                 notesSize = notes.size();
             }
