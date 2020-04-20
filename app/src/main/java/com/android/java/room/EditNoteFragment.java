@@ -101,6 +101,9 @@ public class EditNoteFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                activity.originalOnBackPressed();
+                break;
             case R.id.edit:
                 if (isEditMode) {
                     item.setIcon(R.drawable.pencil_039be5_240);

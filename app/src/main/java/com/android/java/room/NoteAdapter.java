@@ -90,8 +90,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).onEditNoteFragmentStart(notes.get(getAdapterPosition()));
                         break;
                     case 1002:
-
-
+                        ((MainActivity) context).onAlarmFragmentStart();
                         break;
                     case 1003:
                         ((MainActivity) context).onItemDelete(notes.get(getAdapterPosition()).getNumber());

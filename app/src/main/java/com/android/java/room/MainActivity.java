@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private AddNoteFragment addNoteFragment;
     private EditNoteFragment editNoteFragment;
+    private AlarmFragment alarmFragment;
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
     private static NoteAdapter adapter;
@@ -44,20 +45,16 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        // inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setSupportActionBar(binding.toolBar);
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                Log.d("AAA","BBB");
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 adapter.getFilter().filter(newText);
-                Log.d("ZZZ","CCC");
                 return true;
             }
         });
@@ -65,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements
         initialization = true;
         editNoteFragment = new EditNoteFragment();
         addNoteFragment = new AddNoteFragment();
+        alarmFragment = new AlarmFragment();
         pressedTime = 0;
 
         // https://themach.tistory.com/42
@@ -119,6 +117,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onAddNoteFragmentStart() {
         getSupportFragmentManager().beginTransaction().addToBackStack(null)
                 .replace(R.id.container, addNoteFragment).commit();
+    }
+
+    public void onAlarmFragmentStart() {
+        getSupportFragmentManager().beginTransaction().addToBackStack(null)
+                .replace(R.id.container, alarmFragment).commit();
     }
 
     public void onItemDelete(int number) {
