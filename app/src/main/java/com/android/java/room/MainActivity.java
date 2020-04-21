@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
     private static NoteAdapter adapter;
-
-    //private OnBackPressedListener onBackPressedListener;
 
     private LayoutInflater inflater;
     private Note note;
@@ -101,6 +100,19 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        assert action != null;
+        if(action.equals("RUN_FROM_ALARM")) {
+            int number = intent.getIntExtra("NUMBER", -1);
+            onEditNoteFragmentStart(viewModel.getNote(number));
+            // 예외처리 필요. null반환시,
+        }
+    }
+
     public String getDate() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
@@ -119,7 +131,8 @@ public class MainActivity extends AppCompatActivity implements
                 .replace(R.id.container, addNoteFragment).commit();
     }
 
-    public void onAlarmFragmentStart() {
+    public void onAlarmFragmentStart(Note note) {
+        alarmFragment.setNote(note);
         getSupportFragmentManager().beginTransaction().addToBackStack(null)
                 .replace(R.id.container, alarmFragment).commit();
     }

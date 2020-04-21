@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainViewModel extends AndroidViewModel {
     private AppDatabase database;
@@ -26,6 +27,7 @@ public class MainViewModel extends AndroidViewModel {
         return database.noteDao().getAll();
     }
 
+    // This method cannot be executed in the main thread.
     public Note getNoteFromNumber(int number) {
         return database.noteDao().getNoteFromNumber(number);
     }
@@ -83,6 +85,33 @@ public class MainViewModel extends AndroidViewModel {
         protected Void doInBackground(Note... notes) {
             noteDao.update(notes[0]);
             return null;
+        }
+    }
+
+    public Note getNote(int number) {
+        GetNoteAsyncTask getNoteAsyncTask = new GetNoteAsyncTask(database.noteDao(), number);
+        try {
+            return getNoteAsyncTask.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static class GetNoteAsyncTask extends AsyncTask<Void, Void, Note> {
+        private NoteDao noteDao;
+        private int number;
+
+        GetNoteAsyncTask(NoteDao noteDao, int number) {
+            this.noteDao = noteDao;
+            this.number = number;
+        }
+
+        @Override
+        protected Note doInBackground(Void... voids) {
+            return noteDao.getNoteFromNumber(number);
         }
     }
 }

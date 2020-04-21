@@ -14,6 +14,7 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")) {
             Intent intentAlarm = new Intent(context, AlarmReceiver.class);
+
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intentAlarm, 0);
 
             AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);

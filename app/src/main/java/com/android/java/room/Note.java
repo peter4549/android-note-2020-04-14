@@ -1,5 +1,7 @@
 package com.android.java.room;
 
+import android.os.Parcel;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -17,6 +19,14 @@ public class Note {
         this.dateAdd = dateAdd;
         this.dateEdit = dateEdit;
         this.content = content;
+    }
+
+    protected Note(Parcel in) {
+        number = in.readInt();
+        title = in.readString();
+        dateAdd = in.readString();
+        dateEdit = in.readString();
+        content = in.readString();
     }
 
     public String getTitle() {
