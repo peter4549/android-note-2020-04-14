@@ -115,7 +115,7 @@ public class AddNoteFragment extends Fragment {
 
         if (title.equals("")) {
             if(content.length() > 16)
-                title = content.substring(0, 15);
+                title = content.substring(0, 16);
             else
                 title = content;
         }

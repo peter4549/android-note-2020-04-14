@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener{
+        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener,
+        AlarmReceiver.OnAlarmReceiverListener{
+    public static Context mainActivityContext;
     private static boolean initialization;
     static boolean isFragment = false;
 
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(binding.toolBar);
+        mainActivityContext = this;
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -185,5 +188,12 @@ public class MainActivity extends AppCompatActivity implements
         this.note = note;
         viewModel.update(this.note);
         Toast.makeText(this, "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAlarmReceiver(int number) {
+        if (!isFragment) {
+            onEditNoteFragmentStart(viewModel.getNote(number));
+        }
     }
 }

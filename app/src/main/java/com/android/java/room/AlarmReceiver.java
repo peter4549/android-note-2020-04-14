@@ -65,6 +65,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentInfo("Contents of alarm set notes")
                 .setContentIntent(pendingIntent);
 
+        try {
+            ((MainActivity)MainActivity.mainActivityContext).onAlarmReceiver(number);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
         if(notificationManager != null) {
             notificationManager.notify(number, builder.build());
 
@@ -72,5 +78,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             String dateText = new SimpleDateFormat("yyyy-MM-EE-a-hh-mm", Locale.getDefault()).format(currentDateTime);
             Toast.makeText(context.getApplicationContext(), dateText, Toast.LENGTH_LONG).show();
         }
+    }
+
+    public interface OnAlarmReceiverListener {
+        public void onAlarmReceiver(int number);
     }
 }

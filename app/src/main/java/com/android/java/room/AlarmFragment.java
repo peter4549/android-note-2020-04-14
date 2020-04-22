@@ -29,10 +29,9 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class AlarmFragment extends Fragment {
-    public static final String KEY_NUMBER = "kEY_NUMBER";
-    public static final String KEY_TITLE = "kEY_TITLE";
-    public static final String KEY_CONTENT = "kEY_CONTENT";
-    private MainActivity activity;
+    static final String KEY_NUMBER = "kEY_NUMBER";
+    static final String KEY_TITLE = "kEY_TITLE";
+    static final String KEY_CONTENT = "kEY_CONTENT";
     private FragmentAlarmBinding binding;
     private Note note;
 
@@ -76,8 +75,6 @@ public class AlarmFragment extends Fragment {
                     year = Integer.parseInt(buttonText.substring(0, 4));
                     month = Integer.parseInt(buttonText.substring(5, 6));
                     dayOfMonth = Integer.parseInt(buttonText.substring(7));
-                    hour = binding.timePicker.getHour();
-                    minute = binding.timePicker.getMinute();
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                         hour = binding.timePicker.getHour();
@@ -89,10 +86,12 @@ public class AlarmFragment extends Fragment {
 
                     Calendar calendar = new GregorianCalendar(year, month - 1, dayOfMonth,
                             hour, minute, 0);
-                    String text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(calendar.getTime());
+                    String text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ",
+                            Locale.getDefault()).format(calendar.getTime());
                     Toast.makeText(getContext(),text + "으로 알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
 
                     setAlarm(calendar);
+                    ((MainActivity)MainActivity.mainActivityContext).originalOnBackPressed();
                     break;
             }
         }
@@ -133,18 +132,17 @@ public class AlarmFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MainActivity.isFragment = true;
-        showDatePicker();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        MainActivity.isFragment = false;
     }
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        DatePickerDialog dialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+        DatePickerDialog dialog = new DatePickerDialog(Objects.requireNonNull(getActivity()),
+                new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 binding.buttonDate.setText(String.format("%d-%d-%d", year, month + 1, dayOfMonth));

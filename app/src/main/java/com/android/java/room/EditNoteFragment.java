@@ -122,7 +122,10 @@ public class EditNoteFragment extends Fragment {
                 }
                 isEditMode = !isEditMode;
                 break;
-            case R.id.menu_edit:
+            case R.id.menu_alarm:
+                activity.onAlarmFragmentStart(this.note);
+                break;
+            case R.id.menu_share:
                 Toast.makeText(getContext(), "Here!", Toast.LENGTH_SHORT).show();
                 break;
         }
