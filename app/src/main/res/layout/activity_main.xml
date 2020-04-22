@@ -7,13 +7,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
-        android:id="@+id/container">
+        android:id="@+id/container"
+        android:background="@color/colorLime50">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorBlueGreyDark"
+            android:background="@color/colorPrimary"
             android:theme="@style/AppTheme.AppBarOverly"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

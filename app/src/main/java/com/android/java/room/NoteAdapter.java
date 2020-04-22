@@ -12,6 +12,7 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.java.room.databinding.CardViewBinding;

@@ -14,6 +14,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorLime50"
         tools:context=".MainActivity">
 
         <androidx.cardview.widget.CardView
@@ -29,7 +30,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@color/colorLime50">
 
                 <LinearLayout
                     android:layout_width="match_parent"
