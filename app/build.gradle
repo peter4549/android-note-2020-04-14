@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.android.java.room"
+        applicationId "com.elliot.kim.java.room"
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
@@ -23,6 +23,10 @@ android {
 
     dataBinding {
         enabled = true
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 

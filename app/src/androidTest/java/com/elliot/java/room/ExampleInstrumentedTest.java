@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.java.room;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.java.room.R;
 import com.android.java.room.databinding.FragmentAddNoteBinding;
 
 public class AddNoteFragment extends Fragment {
@@ -33,7 +34,6 @@ public class AddNoteFragment extends Fragment {
         super.onAttach(context);
         activity = ((MainActivity)context);
         builder = new AlertDialog.Builder(context);
-        MainActivity.isFragment = true;
     }
 
     @Override
@@ -66,6 +66,12 @@ public class AddNoteFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity.isFragment = true;
     }
 
     @Override

@@ -1,6 +1,5 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,12 +11,21 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.android.java.room.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class AlarmReceiver extends BroadcastReceiver {
+
+    /* Considered unnecessary function
+    public interface OnAlarmReceiverListener {
+        public void onAlarmReceiver(int number);
+    }
+     */
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -53,23 +61,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         } else
             builder.setSmallIcon(R.mipmap.time_8c9eff_240);
 
-        assert content != null;
-        if (content.length() >= 20)
-            content = content.substring(0, 20);
         builder.setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setTicker("{TO SERVICE}")
                 .setContentTitle(title)
                 .setContentText(content)
-                .setContentInfo("Contents of alarm set notes")
+                .setContentInfo("The contents of the note with the alarm set.")
                 .setContentIntent(pendingIntent);
-
-        try {
-            ((MainActivity)MainActivity.mainActivityContext).onAlarmReceiver(number);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
 
         if(notificationManager != null) {
             notificationManager.notify(number, builder.build());
@@ -78,9 +76,5 @@ public class AlarmReceiver extends BroadcastReceiver {
             String dateText = new SimpleDateFormat("yyyy-MM-EE-a-hh-mm", Locale.getDefault()).format(currentDateTime);
             Toast.makeText(context.getApplicationContext(), dateText, Toast.LENGTH_LONG).show();
         }
-    }
-
-    public interface OnAlarmReceiverListener {
-        public void onAlarmReceiver(int number);
     }
 }

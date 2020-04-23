@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.java.room;
 
 import org.junit.Test;
 

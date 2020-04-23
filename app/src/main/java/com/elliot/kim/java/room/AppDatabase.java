@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;

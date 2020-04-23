@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -8,15 +8,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
+import com.android.java.room.R;
 import com.android.java.room.databinding.ActivityMainBinding;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -25,9 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener,
-        AlarmReceiver.OnAlarmReceiverListener{
-    public static Context mainActivityContext;
+        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener {
     private static boolean initialization;
     static boolean isFragment = false;
 
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(binding.toolBar);
-        mainActivityContext = this;
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -190,10 +189,40 @@ public class MainActivity extends AppCompatActivity implements
         Toast.makeText(this, "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
+    public void cancelAlarm(int number) {
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                number,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT);
+        assert alarmManager != null;
+        alarmManager.cancel(pendingIntent);
+
+        removeAlarmInformation(number);
+
+        Toast.makeText(this, "알림이 해제되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void removeAlarmInformation(int number) {
+        SharedPreferences sharedPreferences = getSharedPreferences("alarm_information",
+                        Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(number + "0");
+        editor.remove(number + "1");
+        editor.remove(number + "2");
+        editor.remove(number + "3");
+        editor.apply();
+    }
+
+    /* Considered unnecessary function
     @Override
     public void onAlarmReceiver(int number) {
         if (!isFragment) {
             onEditNoteFragmentStart(viewModel.getNote(number));
         }
     }
+     */
 }

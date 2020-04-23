@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import com.android.java.room.R;
 import com.android.java.room.databinding.FragmentEditNoteBinding;
 
 public class EditNoteFragment extends Fragment {
@@ -81,6 +82,7 @@ public class EditNoteFragment extends Fragment {
     public void onResume() {
         super.onResume();
         isEditMode = false;
+        MainActivity.isFragment = true;
         binding.textViewDateAdd.setText("최초 작성일: " + note.getDateAdd());
         binding.textViewDateEdit.setText("최근 수정일: " + note.getDateEdit());
         binding.editTextContentEdit.setText(note.getContent());

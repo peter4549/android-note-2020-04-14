@@ -1,4 +1,4 @@
-package com.android.java.room;
+package com.elliot.kim.java.room;
 
 import android.content.Context;
 import android.view.ContextMenu;
@@ -12,9 +12,9 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.java.room.R;
 import com.android.java.room.databinding.CardViewBinding;
 
 import java.util.ArrayList;
@@ -78,9 +78,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             MenuItem edit = menu.add(Menu.NONE, 1001, 1, "노트펼치기");
             MenuItem setAlarm = menu.add(Menu.NONE, 1002, 2, "알림설정");
             MenuItem delete = menu.add(Menu.NONE, 1003, 3, "삭제하기");
+            MenuItem cancelAlarm = menu.add(Menu.NONE, 1004, 4, "알람해제");
+
             edit.setOnMenuItemClickListener(menuItemClickListener);
             setAlarm.setOnMenuItemClickListener(menuItemClickListener);
             delete.setOnMenuItemClickListener(menuItemClickListener);
+            cancelAlarm.setOnMenuItemClickListener(menuItemClickListener);
         }
 
         private final MenuItem.OnMenuItemClickListener menuItemClickListener = new MenuItem.OnMenuItemClickListener() {
@@ -97,6 +100,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).onItemDelete(notes.get(getAdapterPosition()).getNumber());
                         delete(getAdapterPosition());
                         break;
+                    case 1004:
+                        ((MainActivity) context).cancelAlarm(notes.get(getAdapterPosition()).getNumber());
                 }
                 return true;
             }
