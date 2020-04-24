@@ -79,4 +79,11 @@ public class Note {
                 ", content='" + content + '\'' +
                 '}';
     }
+
+    public String toStringToShare() {
+        return title + '\n' +
+                "최초 작성일: " + dateAdd + '\n' +
+                "최근 수정일: " + dateEdit + '\n' +
+                "내용:\n" + content;
+    }
 }

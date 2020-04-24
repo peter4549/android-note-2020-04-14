@@ -72,6 +72,18 @@ public class AlarmFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity.isAlarmFragment = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MainActivity.isAlarmFragment = false;
+    }
+
     public void setNote(Note note) {
         this.note = note;
     }

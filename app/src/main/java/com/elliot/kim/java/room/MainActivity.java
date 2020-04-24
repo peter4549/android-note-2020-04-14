@@ -1,5 +1,7 @@
 package com.elliot.kim.java.room;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
@@ -9,12 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,13 +37,14 @@ public class MainActivity extends AppCompatActivity implements
         AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener {
     private static boolean initialization;
     static boolean isFragment = false;
+    static boolean isAlarmFragment = false;
 
     private AddNoteFragment addNoteFragment;
     private EditNoteFragment editNoteFragment;
     private AlarmFragment alarmFragment;
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
-    private static NoteAdapter adapter;
+    private NoteAdapter adapter;
 
     private LayoutInflater inflater;
     private Note note;
@@ -55,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
+                if (!newText.isEmpty())
+                    adapter.getFilter().filter(newText);
                 return true;
             }
         });
@@ -75,13 +84,10 @@ public class MainActivity extends AppCompatActivity implements
         binding.recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
-
-        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+        binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onAddNoteFragmentStart();
-                // viewModel.insert(new Note(getDate(), binding.editText.getText().toString()));
-                // binding.editText.setText(null);
             }
         });
 
@@ -154,7 +160,10 @@ public class MainActivity extends AppCompatActivity implements
                 addNoteFragment.showCheckMessage();
             else
                 super.onBackPressed();
-        } else {
+        } else if (isAlarmFragment) {
+            super.onBackPressed();
+        }
+        else {
             if (pressedTime == 0) {
                 Snackbar.make(findViewById(R.id.container),
                         "한 번 더 누르면 종료됩니다.", Snackbar.LENGTH_LONG).show();
@@ -172,6 +181,26 @@ public class MainActivity extends AppCompatActivity implements
                     android.os.Process.killProcess(android.os.Process.myPid());
                 }
             }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu) ;
+        return true ;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add :
+                onAddNoteFragmentStart();
+                return true;
+            case R.id.menu_sort:
+                showSortDialog();
+                return true;
+            default :
+                return super.onOptionsItemSelected(item) ;
         }
     }
 
@@ -215,6 +244,19 @@ public class MainActivity extends AppCompatActivity implements
         editor.remove(number + "2");
         editor.remove(number + "3");
         editor.apply();
+    }
+
+    private void showSortDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.sort_by)
+                .setItems(getResources().getStringArray(R.array.sort_by),
+                        new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.sort(which);
+                    }
+                });
+        builder.create();
+        builder.show();
     }
 
     /* Considered unnecessary function
