@@ -8,28 +8,28 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 public class DeviceBootReceiver extends BroadcastReceiver {
+    private final String TAG = "DeviceBootReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")) {
             Intent intentToAlarmReceiver = new Intent(context, AlarmReceiver.class);
             AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-            SharedPreferences sharedPreferences = context.getSharedPreferences("alarm_information",
+            SharedPreferences preferences = context.getSharedPreferences("alarm_preferences",
                     Context.MODE_PRIVATE);
-            Map<String, ?> allEntries = sharedPreferences.getAll();
+            Map<String, ?> allEntries = preferences.getAll();
+
             int nb_entries = allEntries.size();
-            int[] intKeySet = Arrays.stream(allEntries.keySet().toArray(new String[0])).mapToInt(Integer::parseInt).toArray();
+            int[] intKeySet = Arrays.stream(allEntries.keySet().toArray(new String[0])).
+                    mapToInt(Integer::parseInt).toArray();
             Arrays.sort(intKeySet);
 
             Calendar calendar = new GregorianCalendar();
@@ -41,13 +41,13 @@ public class DeviceBootReceiver extends BroadcastReceiver {
             for(int i = 0; i < nb_entries; ++i) {
                 String key = Integer.toString(intKeySet[i]);
                 if(count == 0) {
-                    number = sharedPreferences.getInt(key, 0);
+                    number = preferences.getInt(key, 0);
                 } else if (count == 1) {
-                    calendar.setTimeInMillis(sharedPreferences.getLong(key, 0));
+                    calendar.setTimeInMillis(preferences.getLong(key, 0));
                 } else if (count == 2) {
-                    title = sharedPreferences.getString(key, "");
+                    title = preferences.getString(key, "");
                 } else if (count == 3) {
-                    content = sharedPreferences.getString(key, "");
+                    content = preferences.getString(key, "");
                 }
                 ++count;
 
@@ -77,9 +77,7 @@ public class DeviceBootReceiver extends BroadcastReceiver {
                     }
                 }
             }
-            Date currentDateTime = calendar.getTime();
-            String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(currentDateTime);
-            Toast.makeText(context.getApplicationContext(),"[재부팅후] 다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "DeviceBootReceiver has been called.");
         }
     }
 }

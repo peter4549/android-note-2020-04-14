@@ -7,16 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
 import com.android.java.room.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -33,10 +27,10 @@ public class AlarmReceiver extends BroadcastReceiver {
         String title = intent.getStringExtra(AlarmFragment.KEY_TITLE);
         String content = intent.getStringExtra(AlarmFragment.KEY_CONTENT);
 
-        NotificationManager notificationManager = (NotificationManager)context.
+        NotificationManager manager = (NotificationManager)context.
                 getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intentNotification = new Intent(context, MainActivity.class);
-        intentNotification.setAction("RUN_FROM_ALARM");
+        intentNotification.setAction("ALARM_ACTION");
         intentNotification.putExtra("NUMBER", number);
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -48,15 +42,15 @@ public class AlarmReceiver extends BroadcastReceiver {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setSmallIcon(R.drawable.time_8c9eff_240);
 
-            String channelName = "Cat paws notes channel";
-            String description = "This is an alarm channel for cat paw notes.";
+            String channelName = "cat_note_channel";
             int importance = NotificationManager.IMPORTANCE_HIGH;
+            String description = "Notification channel for the Cat Note";
 
             NotificationChannel channel = new NotificationChannel("default", channelName, importance);
             channel.setDescription(description);
 
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
             }
         } else
             builder.setSmallIcon(R.mipmap.time_8c9eff_240);
@@ -66,15 +60,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setWhen(System.currentTimeMillis())
                 .setContentTitle(title)
                 .setContentText(content)
-                .setContentInfo("The contents of the note with the alarm set.")
+                .setContentInfo("Content of note set as notification")
                 .setContentIntent(pendingIntent);
 
-        if(notificationManager != null) {
-            notificationManager.notify(number, builder.build());
-
-            Date currentDateTime = Calendar.getInstance().getTime();
-            String dateText = new SimpleDateFormat("yyyy-MM-EE-a-hh-mm", Locale.getDefault()).format(currentDateTime);
-            Toast.makeText(context.getApplicationContext(), dateText, Toast.LENGTH_LONG).show();
-        }
+        if(manager != null)
+            manager.notify(number, builder.build());
     }
 }

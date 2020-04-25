@@ -10,4 +10,6 @@
     <color name="colorCeruleanAlpha10">#1A1D6A96</color>
     <color name="colorBlueGreyDark">#263238</color>
     <color name="colorYellowActionBar">#fff59d</color>
+    <color name="colorGrey606060Alpha80">#CC606060</color>
+    <color name="colorBlueGrey263238">#263238</color>
 </resources>

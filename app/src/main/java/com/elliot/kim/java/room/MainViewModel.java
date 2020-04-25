@@ -23,62 +23,62 @@ public class MainViewModel extends AndroidViewModel {
                 .build();
     }
 
-    public LiveData<List<Note>> getAll() {
-        return database.noteDao().getAll();
+    LiveData<List<Note>> getAll() {
+        return database.dao().getAll();
     }
 
     // This method cannot be executed in the main thread.
     public Note getNoteFromNumber(int number) {
-        return database.noteDao().getNoteFromNumber(number);
+        return database.dao().getNoteFromNumber(number);
     }
 
-    public void insert(Note note) {
-        new InsertAsyncTask(database.noteDao()).execute(note);
+    void insert(Note note) {
+        new InsertAsyncTask(database.dao()).execute(note);
     }
 
     private static class InsertAsyncTask extends AsyncTask<Note, Void, Void> {
-        private NoteDao noteDao;
+        private NoteDao dao;
 
-        InsertAsyncTask(NoteDao noteDao) {
-            this.noteDao = noteDao;
+        InsertAsyncTask(NoteDao dao) {
+            this.dao = dao;
         }
 
         @Override
         protected Void doInBackground(Note... notes) {
-            noteDao.insert(notes[0]);
+            dao.insert(notes[0]);
             return null;
         }
     }
 
-    public void delete(int number) {
-        new DeleteAsyncTask(database.noteDao(), number).execute();
+    void delete(int number) {
+        new DeleteAsyncTask(database.dao(), number).execute();
     }
 
     private static class DeleteAsyncTask extends AsyncTask<Note, Void, Void> {
-        private NoteDao noteDao;
+        private NoteDao dao;
         private int number;
 
-        DeleteAsyncTask(NoteDao noteDao, int number) {
-            this.noteDao = noteDao;
+        DeleteAsyncTask(NoteDao dao, int number) {
+            this.dao = dao;
             this.number = number;
         }
 
         @Override
         protected Void doInBackground(Note... notes) {
-            noteDao.delete(noteDao.getNoteFromNumber(number));
+            dao.delete(dao.getNoteFromNumber(number));
             return null;
         }
     }
 
-    public void update(Note note) {
-        new UpdateAsyncTask(database.noteDao()).execute(note);
+    void update(Note note) {
+        new UpdateAsyncTask(database.dao()).execute(note);
     }
 
     private static class UpdateAsyncTask extends AsyncTask<Note, Void, Void> {
         private NoteDao noteDao;
 
-        UpdateAsyncTask(NoteDao noteDao) {
-            this.noteDao = noteDao;
+        UpdateAsyncTask(NoteDao dao) {
+            this.noteDao = dao;
         }
 
         @Override
@@ -88,30 +88,28 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    public Note getNote(int number) {
-        GetNoteAsyncTask getNoteAsyncTask = new GetNoteAsyncTask(database.noteDao(), number);
+    Note getNote(int number) {
+        GetNoteAsyncTask getNoteAsyncTask = new GetNoteAsyncTask(database.dao(), number);
         try {
             return getNoteAsyncTask.execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     private static class GetNoteAsyncTask extends AsyncTask<Void, Void, Note> {
-        private NoteDao noteDao;
+        private NoteDao dao;
         private int number;
 
-        GetNoteAsyncTask(NoteDao noteDao, int number) {
-            this.noteDao = noteDao;
+        GetNoteAsyncTask(NoteDao dao, int number) {
+            this.dao = dao;
             this.number = number;
         }
 
         @Override
         protected Note doInBackground(Void... voids) {
-            return noteDao.getNoteFromNumber(number);
+            return dao.getNoteFromNumber(number);
         }
     }
 }

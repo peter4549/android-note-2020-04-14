@@ -1,7 +1,6 @@
 package com.elliot.kim.java.room;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,9 +24,8 @@ import com.android.java.room.databinding.FragmentAddNoteBinding;
 public class AddNoteFragment extends Fragment {
     private MainActivity activity;
     private FragmentAddNoteBinding binding;
-    private Note note;
     private AlertDialog.Builder builder;
-    static boolean contentAdded;
+    static boolean isContentEntered;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -37,15 +35,16 @@ public class AddNoteFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_note,
                 container, false);
         setHasOptionsMenu(true);
         activity.setSupportActionBar(binding.toolBar);
-        binding.toolBar.setTitle("새 노트");
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        contentAdded = false;
+        binding.toolBar.setTitle("새 노트");
+
+        isContentEntered = false;
 
         binding.editTextContent.addTextChangedListener(new TextWatcher() {
 
@@ -56,7 +55,7 @@ public class AddNoteFragment extends Fragment {
 
             @Override
             public void onTextChanged (CharSequence s,int start, int before, int count){
-                contentAdded = count > 0;
+                isContentEntered = count > 0;
             }
 
             @Override
@@ -77,8 +76,8 @@ public class AddNoteFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        contentAdded = false;
         MainActivity.isFragment = false;
+        isContentEntered = false;
         binding.editTextTitle.setText(null);
         binding.editTextContent.setText(null);
     }
@@ -92,7 +91,7 @@ public class AddNoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (contentAdded)
+                if (isContentEntered)
                     showCheckMessage();
                 else {
                     Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
@@ -100,9 +99,8 @@ public class AddNoteFragment extends Fragment {
                 }
                 break;
             case R.id.save:
-                if (contentAdded) {
+                if (isContentEntered) {
                     saveNote();
-                    activity.onAddNote(note);
                     activity.originalOnBackPressed();
                 } else {
                     Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_LONG).show();
@@ -125,37 +123,26 @@ public class AddNoteFragment extends Fragment {
             else
                 title = content;
         }
-        String date = activity.getDate();
-        note = new Note(title, date, date, content);
+        String date = activity.getCurrentTime();
+        activity.saveNoteInDatabase(new Note(title, date, date, content));
     }
 
-    public interface OnAddNoteListener {
-        public void onAddNote(Note note);
-    }
-
-    public void showCheckMessage() {
+    void showCheckMessage() {
         builder.setTitle("노트 저장");
         builder.setMessage("지금까지 작성한 내용을 저장하시겠습니까?");
         builder.setPositiveButton("저장",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        saveNote();
-                        activity.onAddNote(note);
-                        activity.originalOnBackPressed();
-                    }
+                (dialog, id) -> {
+                    saveNote();
+                    activity.originalOnBackPressed();
                 }).setNeutralButton("계속쓰기",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                (dialog, id) -> {
 
-                    }
                 });
 
         builder.setNegativeButton("아니요",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
-                        activity.originalOnBackPressed();
-                    }
+                (dialog, id) -> {
+                    Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    activity.originalOnBackPressed();
                 });
         builder.create();
         builder.show();

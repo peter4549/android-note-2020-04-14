@@ -2,6 +2,7 @@ package com.elliot.kim.java.room;
 
 import android.os.Parcel;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -41,15 +42,17 @@ public class Note {
         return dateAdd;
     }
 
+    /*
     public void setDateAdd(String dateAdd) {
         this.dateAdd = dateAdd;
     }
+     */
 
     public String getDateEdit() {
         return dateEdit;
     }
 
-    public void setDateEdit(String dateEdit) {
+    void setDateEdit(String dateEdit) {
         this.dateEdit = dateEdit;
     }
 
@@ -69,6 +72,7 @@ public class Note {
         this.content = note;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Note{" +
@@ -80,7 +84,7 @@ public class Note {
                 '}';
     }
 
-    public String toStringToShare() {
+    String toStringToShare() {
         return title + '\n' +
                 "최초 작성일: " + dateAdd + '\n' +
                 "최근 수정일: " + dateEdit + '\n' +

@@ -25,19 +25,14 @@ import java.util.List;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder>
         implements Filterable {
-    private List<Note> notes;
-    private List<Note> notesFiltered;
     private final Context context;
-    private int position;
+    private List<Note> noteList;
+    private List<Note> noteListFiltered;
 
-    public NoteAdapter(List<Note> notes, Context context) {
-        this.notes = notes;
-        notesFiltered = notes;
+    NoteAdapter(Context context, List<Note> notes) {
         this.context = context;
-    }
-
-    private void setPosition(int position) {
-        this.position = position;
+        this.noteList = notes;
+        noteListFiltered = notes;
     }
 
     @Override
@@ -48,24 +43,25 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             protected FilterResults performFiltering(CharSequence constraint) {
                 String searchWord = constraint.toString();
                 if(searchWord.isEmpty()) {
-                    notesFiltered = notes;
+                    noteListFiltered = noteList;
                 } else {
-                    List<Note> notesFiltering = new ArrayList<>();
-                    for(Note note : notes) {
+                    List<Note> noteListFiltering = new ArrayList<>();
+                    for(Note note : noteList) {
                         if (note.getTitle().toLowerCase().contains(searchWord.toLowerCase())) {
-                            notesFiltering.add(note);
+                            noteListFiltering.add(note);
                         }
                     }
-                    notesFiltered = notesFiltering;
+                    noteListFiltered = noteListFiltering;
                 }
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = notesFiltered;
+                filterResults.values = noteListFiltered;
+
                 return filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                notesFiltered = (List<Note>)results.values;
+                noteListFiltered = (List<Note>)results.values;
                 notifyDataSetChanged();
             }
         };
@@ -75,7 +71,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             implements View.OnCreateContextMenuListener{
         CardViewBinding binding;
 
-        public NoteViewHolder(@NonNull View itemView) {
+        NoteViewHolder(@NonNull View itemView) {
             super(itemView);
             binding = CardViewBinding.bind(itemView);
             itemView.setOnCreateContextMenuListener(this);
@@ -99,22 +95,23 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         private final MenuItem.OnMenuItemClickListener menuItemClickListener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                Note note = noteList.get(getAdapterPosition());
                 switch (item.getItemId()) {
                     case 1001:
-                        ((MainActivity) context).onEditNoteFragmentStart(notes.get(getAdapterPosition()));
+                        ((MainActivity) context).onEditNoteFragmentStart(note);
                         break;
                     case 1002:
-                        ((MainActivity) context).onAlarmFragmentStart(notes.get(getAdapterPosition()));
+                        ((MainActivity) context).onAlarmFragmentStart(note);
                         break;
                     case 1003:
-                        ((MainActivity) context).onItemDelete(notes.get(getAdapterPosition()).getNumber());
+                        ((MainActivity) context).deleteNote(note.getNumber());
                         delete(getAdapterPosition());
                         break;
                     case 1004:
-                        ((MainActivity) context).cancelAlarm(notes.get(getAdapterPosition()).getNumber());
+                        ((MainActivity) context).cancelAlarm(note.getNumber());
                         break;
                     case 1005:
-                        share();
+                        share(note);
                         break;
                 }
                 return true;
@@ -133,75 +130,61 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, final int position) {
-        setPosition(position);
-        Note note = notesFiltered.get(position);
+        Note note = noteListFiltered.get(position);
         holder.binding.textViewTitle.setText(note.getTitle());
         holder.binding.textViewDate.setText(note.getDateEdit());
 
-        holder.binding.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) context).onEditNoteFragmentStart(notesFiltered.get(position));
-            }
-        });
-
-        holder.binding.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return false;
-            }
-        });
+        holder.binding.cardView.setOnClickListener(v -> ((MainActivity) context).onEditNoteFragmentStart(note));
+        holder.binding.cardView.setOnLongClickListener(v -> false);
     }
 
     @Override
     public int getItemCount() {
-        return notesFiltered == null ? 0 : notesFiltered.size();
+        return noteListFiltered == null ? 0 : noteListFiltered.size();
     }
 
     void insert(Note note) {
-        this.notes.add(note);
-        notifyItemInserted(this.notes.size() - 1);
+        this.noteList.add(note);
+        notifyItemInserted(this.noteList.size() - 1);
     }
 
     private void delete(int position) {
-        notes.remove(position);
+        noteList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    void delete(Note note) {
+        int position = noteList.indexOf(note);
+        noteList.remove(note);
         notifyItemRemoved(position);
     }
 
     void sort(int sortBy) {
-        Collections.sort(notes, new Comparator<Note>() {
-            @Override
-            public int compare(Note o1, Note o2) {
-                switch (sortBy) {
-                    case 0:
-                        return (int) (Long.parseLong(o2.getDateAdd().replaceAll("[^0-9]",""))
-                                                        - Long.parseLong(o1.getDateAdd().replaceAll("[^0-9]","")));
-                    case 1:
-                        return (int) (Long.parseLong(o2.getDateEdit().replaceAll("[^0-9]",""))
-                                - Long.parseLong(o1.getDateEdit().replaceAll("[^0-9]","")));
-                    case 2:
-                        return o1.getTitle().compareTo(o2.getTitle());
-                    default:
-                        return 0;
-                }
+        Collections.sort(noteList, (o1, o2) -> {
+            switch (sortBy) {
+                case 0:
+                    return (int) (Long.parseLong(o2.getDateAdd().replaceAll("[^0-9]",""))
+                                                    - Long.parseLong(o1.getDateAdd().replaceAll("[^0-9]","")));
+                case 1:
+                    return (int) (Long.parseLong(o2.getDateEdit().replaceAll("[^0-9]",""))
+                            - Long.parseLong(o1.getDateEdit().replaceAll("[^0-9]","")));
+                case 2:
+                    return o1.getTitle().compareTo(o2.getTitle());
+                default:
+                    return 0;
             }
         });
-        notifyDataSetChanged();
     }
 
-    void share() {
+    void share(Note note) {
         Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         intent.setType("text/plain");
-// Set default text message
-// 카톡, 이메일, MMS 다 이걸로 설정 가능
-//String subject = "문자의 제목";
-        String text = notes.get(position).toStringToShare();
-        intent.putExtra(Intent.EXTRA_SUBJECT, "catpaws\n");
+
+        String text = note.toStringToShare();
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Cat Note\n");
         intent.putExtra(Intent.EXTRA_TEXT, text);
 
-// Title of intent
-        Intent chooser = Intent.createChooser(intent, "친구에게 공유하기");
+        Intent chooser = Intent.createChooser(intent, "공유하기");
         context.startActivity(chooser);
-
     }
 }

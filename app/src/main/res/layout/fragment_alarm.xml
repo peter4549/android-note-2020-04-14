@@ -7,26 +7,50 @@
         android:layout_height="match_parent"
         tools:context="com.elliot.kim.java.room.AlarmFragment"
         android:orientation="vertical"
-        android:background="@color/colorAccent">
+        android:background="@color/colorGrey606060Alpha80"
+        android:gravity="center"
+        android:clickable="true">
 
-        <Button
-            android:id="@+id/button_date"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+            android:orientation="vertical"
+            android:background="@color/colorBlueGrey263238"
+            android:layout_gravity="center">
 
-        <TimePicker
-            android:id="@+id/time_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:timePickerMode="spinner"
-            android:layout_gravity="center_horizontal"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorLime50"
+                android:text="알림 설정"
+                android:textStyle="bold"
+                android:textColor="@color/colorBlueGreyDark"
+                android:textAlignment="center" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="확인" />
+            <Button
+                android:id="@+id/button_set_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="12dp"/>
 
+            <TimePicker
+                style="@style/TimePickerTextColor"
+                android:id="@+id/time_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                android:layout_gravity="center_horizontal"/>
+
+            <Button
+                android:id="@+id/button_set_alarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="6dp"
+                android:paddingBottom="12dp"
+                android:text="알림 등록" />
+
+        </LinearLayout>
     </LinearLayout>
 </layout>

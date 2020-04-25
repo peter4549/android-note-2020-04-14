@@ -1,6 +1,5 @@
 package com.elliot.kim.java.room;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -11,18 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import com.android.java.room.R;
@@ -33,27 +29,29 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
-        AddNoteFragment.OnAddNoteListener, EditNoteFragment.OnEditNoteListener {
+public class MainActivity extends AppCompatActivity {
     private static boolean initialization;
     static boolean isFragment = false;
     static boolean isAlarmFragment = false;
 
+    private ActivityMainBinding binding;
+    private LayoutAnimationController animationController;
+
     private AddNoteFragment addNoteFragment;
     private EditNoteFragment editNoteFragment;
     private AlarmFragment alarmFragment;
+
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
-    private NoteAdapter adapter;
 
-    private LayoutInflater inflater;
-    private Note note;
+    public NoteAdapter adapter;
+
     private long pressedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(binding.toolBar);
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -68,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
         });
+       animationController = AnimationUtils.loadLayoutAnimation(getApplicationContext(),
+                R.anim.layout_animation);
 
         initialization = true;
         editNoteFragment = new EditNoteFragment();
@@ -81,29 +81,27 @@ public class MainActivity extends AppCompatActivity implements
         }
         viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
 
-        binding.recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(layoutManager);
-        binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onAddNoteFragmentStart();
-            }
-        });
+        binding.floatingActionButton.setOnClickListener(v -> onAddNoteFragmentStart());
 
         viewModel.getAll().observe(this, new Observer<List<Note>>() {
-            int notesSize;
+            int noteListSize;
 
             @Override
-            public void onChanged(List<Note> notes) {
+            public void onChanged(List<Note> noteList) {
                 if (initialization) {
-                    adapter = new NoteAdapter(notes, MainActivity.this);
+                    adapter = new NoteAdapter(MainActivity.this, noteList);
                     binding.recyclerView.setAdapter(adapter);
+                    binding.recyclerView.setLayoutAnimation(animationController);
+                    binding.recyclerView.scheduleLayoutAnimation();
+
                     initialization = false;
-                } else if (notesSize < notes.size()) {
-                    ((NoteAdapter)adapter).insert(notes.get(notes.size() - 1));
+                } else if (noteListSize < noteList.size()) {
+                    adapter.insert(noteList.get(noteList.size() - 1));
                 }
-                notesSize = notes.size();
+                noteListSize = noteList.size();
             }
         });
     }
@@ -114,14 +112,14 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         String action = intent.getAction();
         assert action != null;
-        if(action.equals("RUN_FROM_ALARM")) {
+        if(action.equals("ALARM_ACTION")) {
             int number = intent.getIntExtra("NUMBER", -1);
             onEditNoteFragmentStart(viewModel.getNote(number));
             // 예외처리 필요. null반환시,
         }
     }
 
-    public String getDate() {
+    public String getCurrentTime() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -145,8 +143,9 @@ public class MainActivity extends AppCompatActivity implements
                 .replace(R.id.container, alarmFragment).commit();
     }
 
-    public void onItemDelete(int number) {
+    public void deleteNote(int number) {
         viewModel.delete(number);
+        removeAlarmPreferences(number);
     }
 
     public void originalOnBackPressed() {
@@ -156,8 +155,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         if (isFragment) {
-            if(AddNoteFragment.contentAdded)
+            if(AddNoteFragment.isContentEntered)
                 addNoteFragment.showCheckMessage();
+            else if(EditNoteFragment.isContentChanged)
+                editNoteFragment.showCheckMessage();
             else
                 super.onBackPressed();
         } else if (isAlarmFragment) {
@@ -204,17 +205,13 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onAddNote(Note note) {
-        this.note = note;
+    public void saveNoteInDatabase(Note note) {
         viewModel.insert(note);
         Toast.makeText(this, "노트가 저장되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onEditNote(Note note) {
-        this.note = note;
-        viewModel.update(this.note);
+    public void applyEditNote(Note note) {
+        viewModel.update(note);
         Toast.makeText(this, "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
@@ -227,15 +224,16 @@ public class MainActivity extends AppCompatActivity implements
                 number,
                 intent,
                 PendingIntent.FLAG_ONE_SHOT);
+
         assert alarmManager != null;
         alarmManager.cancel(pendingIntent);
 
-        removeAlarmInformation(number);
+        removeAlarmPreferences(number);
 
         Toast.makeText(this, "알림이 해제되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
-    private void removeAlarmInformation(int number) {
+    private void removeAlarmPreferences(int number) {
         SharedPreferences sharedPreferences = getSharedPreferences("alarm_information",
                         Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -250,13 +248,19 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.sort_by)
                 .setItems(getResources().getStringArray(R.array.sort_by),
-                        new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        adapter.sort(which);
-                    }
-                });
+                        (dialog, which) -> {
+                            adapter.sort(which);
+                            adapter.notifyDataSetChanged();
+                            binding.recyclerView.setLayoutAnimation(animationController);
+                            binding.recyclerView.scheduleLayoutAnimation();
+                        });
         builder.create();
         builder.show();
+    }
+
+    // Function for use in EditNoteFragment
+    public void share(Note note) {
+        adapter.share(note);
     }
 
     /* Considered unnecessary function
