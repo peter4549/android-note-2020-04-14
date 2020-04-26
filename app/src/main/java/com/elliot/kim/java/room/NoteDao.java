@@ -24,5 +24,5 @@ public interface NoteDao {
     void delete(Note note);
 
     @Query("SELECT * FROM Note WHERE number LIKE :number")
-    Note getNoteFromNumber(int number);
+    Note getNoteByNumber(int number);
 }

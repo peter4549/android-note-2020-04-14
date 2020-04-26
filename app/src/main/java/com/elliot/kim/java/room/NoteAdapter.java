@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -20,7 +21,6 @@ import com.android.java.room.databinding.CardViewBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder>
@@ -80,15 +80,21 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             MenuItem edit = menu.add(Menu.NONE, 1001, 1, "노트펼치기");
-            MenuItem setAlarm = menu.add(Menu.NONE, 1002, 2, "알림설정");
-            MenuItem delete = menu.add(Menu.NONE, 1003, 3, "삭제하기");
-            MenuItem cancelAlarm = menu.add(Menu.NONE, 1004, 4, "알람해제");
+            MenuItem setAlarm, cancelAlarm;
+            if (noteListFiltered.get(getAdapterPosition()).getAlarmSet()) {
+                setAlarm = menu.add(Menu.NONE, 1002, 2, "알림변경");
+                cancelAlarm = menu.add(Menu.NONE, 1003, 3, "알림삭제");
+                cancelAlarm.setOnMenuItemClickListener(menuItemClickListener);
+            }
+            else
+                setAlarm = menu.add(Menu.NONE, 1002, 2, "알림설정");
+
+            MenuItem delete = menu.add(Menu.NONE, 1004, 4, "삭제하기");
             MenuItem share = menu.add(Menu.NONE, 1005, 5, "공유하기");
 
             edit.setOnMenuItemClickListener(menuItemClickListener);
             setAlarm.setOnMenuItemClickListener(menuItemClickListener);
             delete.setOnMenuItemClickListener(menuItemClickListener);
-            cancelAlarm.setOnMenuItemClickListener(menuItemClickListener);
             share.setOnMenuItemClickListener(menuItemClickListener);
         }
 
@@ -104,11 +110,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).onAlarmFragmentStart(note);
                         break;
                     case 1003:
-                        ((MainActivity) context).deleteNote(note.getNumber());
-                        delete(getAdapterPosition());
+                        ((MainActivity) context).cancelAlarm(note.getNumber());
+                        note.setAlarmSet(false);
                         break;
                     case 1004:
-                        ((MainActivity) context).cancelAlarm(note.getNumber());
+                        ((MainActivity) context).deleteNote(note.getNumber());
+                        delete(getAdapterPosition());
                         break;
                     case 1005:
                         share(note);
@@ -122,10 +129,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @NonNull
     @Override
     public NoteAdapter.NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
+        FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view, parent, false);
 
-        return new NoteViewHolder(linearLayout);
+        return new NoteViewHolder(frameLayout);
     }
 
     @Override

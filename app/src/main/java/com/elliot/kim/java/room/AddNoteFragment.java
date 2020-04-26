@@ -148,4 +148,3 @@ public class AddNoteFragment extends Fragment {
         builder.show();
     }
 }
-

@@ -14,12 +14,16 @@ public class Note {
     private String dateAdd;
     private String dateEdit;
     private String content;
+    private Boolean isAlarmSet;
+    private Boolean isChecked;
 
     public Note(String title, String dateAdd, String dateEdit, String content) {
         this.title = title;
         this.dateAdd = dateAdd;
         this.dateEdit = dateEdit;
         this.content = content;
+        isAlarmSet = false;
+        isChecked = false;
     }
 
     protected Note(Parcel in) {
@@ -70,6 +74,22 @@ public class Note {
 
     public void setContent(String note) {
         this.content = note;
+    }
+
+    public Boolean getAlarmSet() {
+        return isAlarmSet;
+    }
+
+    public void setAlarmSet(Boolean alarmSet) {
+        isAlarmSet = alarmSet;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
     }
 
     @NonNull

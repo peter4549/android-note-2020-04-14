@@ -29,7 +29,7 @@ public class MainViewModel extends AndroidViewModel {
 
     // This method cannot be executed in the main thread.
     public Note getNoteFromNumber(int number) {
-        return database.dao().getNoteFromNumber(number);
+        return database.dao().getNoteByNumber(number);
     }
 
     void insert(Note note) {
@@ -65,7 +65,7 @@ public class MainViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(Note... notes) {
-            dao.delete(dao.getNoteFromNumber(number));
+            dao.delete(dao.getNoteByNumber(number));
             return null;
         }
     }
@@ -109,7 +109,7 @@ public class MainViewModel extends AndroidViewModel {
 
         @Override
         protected Note doInBackground(Void... voids) {
-            return dao.getNoteFromNumber(number);
+            return dao.getNoteByNumber(number);
         }
     }
 }

@@ -27,6 +27,25 @@
                 android:textColor="@color/colorBlueGreyDark"
                 android:textAlignment="center" />
 
+            <TextView
+                android:id="@+id/text_view_current_time_set"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorYellowActionBar"
+                android:text="현재 설정된 알림시간"
+                android:textStyle="bold"
+                android:textColor="@color/colorBlueGreyDark"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/text_view_current_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorYellowActionBar"
+                android:textStyle="bold"
+                android:textColor="@color/colorBlueGrey263238"
+                android:textAlignment="center" />
+
             <Button
                 android:id="@+id/button_set_date"
                 android:layout_width="wrap_content"

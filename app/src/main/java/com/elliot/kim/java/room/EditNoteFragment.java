@@ -155,6 +155,7 @@ public class EditNoteFragment extends Fragment {
         builder.setPositiveButton("저장",
                 (dialog, id) -> {
                     activity.applyEditNote(note);
+                    Toast.makeText(getContext(), "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
                     activity.originalOnBackPressed();
                 }).setNeutralButton("계속쓰기",
                 (dialog, id) -> {

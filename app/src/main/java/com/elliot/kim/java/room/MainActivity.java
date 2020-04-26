@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
@@ -114,8 +115,14 @@ public class MainActivity extends AppCompatActivity {
         assert action != null;
         if(action.equals("ALARM_ACTION")) {
             int number = intent.getIntExtra("NUMBER", -1);
+            // why>?????
+            Log.d("NUM", number+"");
+            Log.d("content:::", viewModel.getNote(number).getContent());
             onEditNoteFragmentStart(viewModel.getNote(number));
-            // 예외처리 필요. null반환시,
+            // 예외처리 필요. null반환시,숫자를 못찾을때,, 왜 ?? getNote가 일안함. 아닌가
+            //인덱스 잘못됫을 가능성도... 갑자기근데??, 그냥 다 인덱스 1이네 ㅅㅂ. 뭐냐.가
+            // 인덱스를 1만 던지고 있다.. 이런 시박
+            //
         }
     }
 
@@ -145,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteNote(int number) {
         viewModel.delete(number);
-        removeAlarmPreferences(number);
+        cancelAlarm(number);
     }
 
     public void originalOnBackPressed() {
@@ -212,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void applyEditNote(Note note) {
         viewModel.update(note);
-        Toast.makeText(this, "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
     public void cancelAlarm(int number) {
@@ -263,6 +269,10 @@ public class MainActivity extends AppCompatActivity {
         adapter.share(note);
     }
 
+    public Note getNote(int number) {
+        return viewModel.getNote(number);
+    }
+
     /* Considered unnecessary function
     @Override
     public void onAlarmReceiver(int number) {
@@ -271,4 +281,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
      */
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
 }

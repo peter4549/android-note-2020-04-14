@@ -9,18 +9,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -28,6 +30,8 @@ import android.widget.Toast;
 import com.android.java.room.R;
 import com.android.java.room.databinding.FragmentAlarmBinding;
 
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,8 +46,8 @@ public class AlarmFragment extends Fragment {
     private MainActivity activity;
     private FragmentAlarmBinding binding;
     private Note note;
+    private Boolean isAlarmSet;
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -58,7 +62,7 @@ public class AlarmFragment extends Fragment {
         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
         SimpleDateFormat monthFormat = new SimpleDateFormat("MM", Locale.getDefault());
         SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("dd", Locale.getDefault());
-        SimpleDateFormat hourFormat = new SimpleDateFormat("KK", Locale.getDefault());
+        SimpleDateFormat hourFormat = new SimpleDateFormat("kk", Locale.getDefault());
         SimpleDateFormat minuteFormat = new SimpleDateFormat("mm", Locale.getDefault());
 
         int prevYear = Integer.parseInt(yearFormat.format(currentTime));
@@ -84,6 +88,25 @@ public class AlarmFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MainActivity.isAlarmFragment = true;
+        isAlarmSet = note.getAlarmSet();
+
+        if(isAlarmSet) {
+            binding.textViewCurrentTimeSet.setVisibility(View.VISIBLE);
+            binding.textViewCurrentTime.setVisibility(View.VISIBLE);
+
+            SharedPreferences preferences = getActivity().getSharedPreferences(
+                    "alarm_preferences",
+                    Context.MODE_PRIVATE);
+            Long what = preferences.getLong(note.getNumber()+"1", 0);
+            String pattern = "yyyy-MM-dd HH:mm:ss";
+            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+            String date = formatter.format(new Timestamp(what));
+            binding.textViewCurrentTime.setText(date);
+        } else {
+            binding.textViewCurrentTimeSet.setVisibility(View.INVISIBLE);
+            binding.textViewCurrentTime.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     @Override
@@ -143,13 +166,13 @@ public class AlarmFragment extends Fragment {
 
             intent.putExtra(KEY_NUMBER, number);
             intent.putExtra(KEY_TITLE, title);
-            intent.putExtra(KEY_CONTENT, note.getContent());
+            intent.putExtra(KEY_CONTENT, content);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     activity,
-                    note.getNumber(),
+                    number,
                     intent,
-                    PendingIntent.FLAG_ONE_SHOT);
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
             if(alarmManager != null) {
@@ -173,6 +196,9 @@ public class AlarmFragment extends Fragment {
              */
 
             saveAlarmPreferences(number, calendar.getTimeInMillis(), title, content);
+
+            note.setAlarmSet(true);
+            activity.applyEditNote(note);
 
             manager.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -207,7 +233,6 @@ public class AlarmFragment extends Fragment {
         editor.apply();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void setTimePickerTextColor(TimePicker timePicker, final int id) {
         final Resources system = Resources.getSystem();
         final int color = ContextCompat.getColor(Objects.requireNonNull(getContext()), id);
@@ -216,8 +241,38 @@ public class AlarmFragment extends Fragment {
         int minuteNumberPickerId = system.getIdentifier("minute", "id", "android");
         int amPmNumberPickerId = system.getIdentifier("amPm", "id", "android");
 
-        ((NumberPicker) timePicker.findViewById(hourNumberPickerId)).setTextColor(color);
-        ((NumberPicker) timePicker.findViewById(minuteNumberPickerId)).setTextColor(color);
-        ((NumberPicker) timePicker.findViewById(amPmNumberPickerId)).setTextColor(color);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ((NumberPicker) timePicker.findViewById(hourNumberPickerId)).setTextColor(color);
+            ((NumberPicker) timePicker.findViewById(minuteNumberPickerId)).setTextColor(color);
+            ((NumberPicker) timePicker.findViewById(amPmNumberPickerId)).setTextColor(color);
+        } else {
+            NumberPicker hourNumberPicker = timePicker.findViewById(hourNumberPickerId);
+            NumberPicker minuteNumberPicker = timePicker.findViewById(minuteNumberPickerId);
+            NumberPicker amPmNumberPicker = timePicker.findViewById(amPmNumberPickerId);
+
+            setNumberPickerTextColor(hourNumberPicker, color);
+            setNumberPickerTextColor(minuteNumberPicker, color);
+            setNumberPickerTextColor(amPmNumberPicker, color);
+        }
+    }
+
+    private void setNumberPickerTextColor(NumberPicker numberPicker, final int color){
+        final int count = numberPicker.getChildCount();
+
+        for(int i = 0; i < count; i++){
+            View child = numberPicker.getChildAt(i);
+
+            try{
+                Field wheelPaintField = numberPicker.getClass().getDeclaredField("mSelectorWheelPaint");
+                wheelPaintField.setAccessible(true);
+
+                ((Paint)wheelPaintField.get(numberPicker)).setColor(color);
+                ((EditText)child).setTextColor(color);
+                numberPicker.invalidate();
+            }
+            catch(NoSuchFieldException | IllegalAccessException | IllegalArgumentException e){
+                e.printStackTrace();
+            }
+        }
     }
 }
