@@ -18,14 +18,30 @@
             android:background="@color/colorBlueGrey263238"
             android:layout_gravity="center">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorLime50"
-                android:text="알림 설정"
-                android:textStyle="bold"
-                android:textColor="@color/colorBlueGreyDark"
-                android:textAlignment="center" />
+            <RelativeLayout
+                android:layout_width="272dp"
+                android:layout_height="32dp" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:background="@color/colorLime50"
+                    android:text="알림 설정"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorBlueGreyDark"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <ImageView
+                    android:id="@+id/image_view_exit"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="4dp"
+                    android:src="@drawable/x_mark_ff6f00_240"
+                    android:clickable="true"
+                    android:contentDescription="Close the AlarmFragment" />
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/text_view_current_time_set"
@@ -56,7 +72,7 @@
             <TimePicker
                 style="@style/TimePickerTextColor"
                 android:id="@+id/time_picker"
-                android:layout_width="wrap_content"
+                android:layout_width="272dp"
                 android:layout_height="wrap_content"
                 android:timePickerMode="spinner"
                 android:layout_gravity="center_horizontal"/>

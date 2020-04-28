@@ -15,7 +15,7 @@
         android:title="공유하기"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_complete_check"
+    <item android:id="@+id/menu_done"
         android:title="완료체크"
         app:showAsAction="never"/>
 

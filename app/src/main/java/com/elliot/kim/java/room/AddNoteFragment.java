@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.android.java.room.R;
@@ -71,15 +72,26 @@ public class AddNoteFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MainActivity.isFragment = true;
+        MainActivity.fab.hide();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         MainActivity.isFragment = false;
+
+        InputMethodManager manager = (InputMethodManager) activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (manager != null)
+            manager.hideSoftInputFromWindow(binding.editTextContent.getWindowToken(),
+                    0);
+
         isContentEntered = false;
+
         binding.editTextTitle.setText(null);
         binding.editTextContent.setText(null);
+
+        MainActivity.fab.show();
     }
 
     @Override

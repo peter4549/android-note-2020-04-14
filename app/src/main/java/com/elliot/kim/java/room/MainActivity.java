@@ -3,6 +3,7 @@ package com.elliot.kim.java.room;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 
 import com.android.java.room.R;
 import com.android.java.room.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static boolean initialization;
     static boolean isFragment = false;
     static boolean isAlarmFragment = false;
+    static FloatingActionButton fab;
 
     private ActivityMainBinding binding;
     private LayoutAnimationController animationController;
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewModelProvider.AndroidViewModelFactory viewModelFactory;
     private MainViewModel viewModel;
 
-    public NoteAdapter adapter;
+    NoteAdapter adapter;
 
     private long pressedTime;
 
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         editNoteFragment = new EditNoteFragment();
         addNoteFragment = new AddNoteFragment();
         alarmFragment = new AlarmFragment();
+
         pressedTime = 0;
 
         // https://themach.tistory.com/42
@@ -85,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(layoutManager);
-        binding.floatingActionButton.setOnClickListener(v -> onAddNoteFragmentStart());
+
+        fab = binding.floatingActionButton;
+        fab.setOnClickListener(v -> onAddNoteFragmentStart());
 
         viewModel.getAll().observe(this, new Observer<List<Note>>() {
             int noteListSize;
@@ -101,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
                     initialization = false;
                 } else if (noteListSize < noteList.size()) {
                     adapter.insert(noteList.get(noteList.size() - 1));
+                    Note note = noteList.get(noteList.size() - 1);
+                    Toast.makeText(getApplicationContext(),
+                            "WAT"+note.getTitle()
+                            + note.getNumber() + ""
+                    ,Toast.LENGTH_LONG).show();
+                    //adapter.notifyItemInserted();
                 }
                 noteListSize = noteList.size();
             }
@@ -115,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         assert action != null;
         if(action.equals("ALARM_ACTION")) {
             int number = intent.getIntExtra("NUMBER", -1);
+            Toast.makeText(this,"AAAA", Toast.LENGTH_SHORT);
             // why>?????
             Log.d("NUM", number+"");
             Log.d("content:::", viewModel.getNote(number).getContent());
@@ -140,8 +154,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onAddNoteFragmentStart() {
-        getSupportFragmentManager().beginTransaction().addToBackStack(null)
+        getSupportFragmentManager().beginTransaction()
+                //.setCustomAnimations(R.anim.anim_recycler_view)
+                .addToBackStack(null)
                 .replace(R.id.container, addNoteFragment).commit();
+
+
     }
 
     public void onAlarmFragmentStart(Note note) {
@@ -150,9 +168,9 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.container, alarmFragment).commit();
     }
 
-    public void deleteNote(int number) {
-        viewModel.delete(number);
-        cancelAlarm(number);
+    public void deleteNote(Note note) {
+        viewModel.delete(note.getNumber());
+        cancelAlarm(note);
     }
 
     public void originalOnBackPressed() {
@@ -217,11 +235,13 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "노트가 저장되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
-    public void applyEditNote(Note note) {
+    public void updateNote(Note note) {
         viewModel.update(note);
+        adapter.notifyDataSetChanged();
     }
 
-    public void cancelAlarm(int number) {
+    public void cancelAlarm(Note note) {
+        int number = note.getNumber();
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(this, AlarmReceiver.class);
@@ -235,6 +255,10 @@ public class MainActivity extends AppCompatActivity {
         alarmManager.cancel(pendingIntent);
 
         removeAlarmPreferences(number);
+
+        note.setAlarmSet(false);
+        viewModel.update(note);
+        adapter.notifyDataSetChanged();
 
         Toast.makeText(this, "알림이 해제되었습니다.", Toast.LENGTH_SHORT).show();
     }
@@ -281,10 +305,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
      */
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-    }
 }

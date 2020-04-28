@@ -15,7 +15,7 @@ public class Note {
     private String dateEdit;
     private String content;
     private Boolean isAlarmSet;
-    private Boolean isChecked;
+    private Boolean isDone;
 
     public Note(String title, String dateAdd, String dateEdit, String content) {
         this.title = title;
@@ -23,7 +23,7 @@ public class Note {
         this.dateEdit = dateEdit;
         this.content = content;
         isAlarmSet = false;
-        isChecked = false;
+        isDone = false;
     }
 
     protected Note(Parcel in) {
@@ -84,12 +84,12 @@ public class Note {
         isAlarmSet = alarmSet;
     }
 
-    public Boolean getChecked() {
-        return isChecked;
+    public Boolean getIsDone() {
+        return isDone;
     }
 
-    public void setChecked(Boolean checked) {
-        isChecked = checked;
+    public void setIsDone(Boolean checked) {
+        isDone = checked;
     }
 
     @NonNull

@@ -80,6 +80,7 @@ public class EditNoteFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MainActivity.isFragment = true;
+        MainActivity.fab.hide();
         isEditMode = false;
 
         String dateAddText = "최초 작성일: " + note.getDateAdd();
@@ -95,6 +96,7 @@ public class EditNoteFragment extends Fragment {
     public void onStop() {
         super.onStop();
         MainActivity.isFragment = false;
+        MainActivity.fab.show();
         isContentChanged = false;
     }
 
@@ -105,6 +107,12 @@ public class EditNoteFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_done) {
+            if (note.getIsDone())
+                item.setTitle("완료해제");
+            else
+                item.setTitle("완료체크");
+        }
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (isContentChanged) {
@@ -121,7 +129,7 @@ public class EditNoteFragment extends Fragment {
                         note.setDateEdit(activity.getCurrentTime());
                         note.setContent(charSequence.toString());
 
-                        activity.applyEditNote(note);
+                        activity.updateNote(note);
                         Toast.makeText(getContext(), "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
                         activity.originalOnBackPressed();
                     } else {
@@ -139,8 +147,16 @@ public class EditNoteFragment extends Fragment {
             case R.id.menu_share:
                 activity.share(note);
                 break;
+            case R.id.menu_done:
+                if (note.getIsDone())
+                    note.setIsDone(false);
+                else
+                    note.setIsDone(true);
+
+                activity.updateNote(note);
+                break;
             case R.id.menu_delete:
-                activity.deleteNote(note.getNumber());
+                activity.deleteNote(note);
                 activity.adapter.delete(note);
                 Toast.makeText(getContext(), "노트가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                 activity.originalOnBackPressed();
@@ -154,7 +170,7 @@ public class EditNoteFragment extends Fragment {
         builder.setMessage("지금까지 편집한 내용을 저장하시겠습니까?");
         builder.setPositiveButton("저장",
                 (dialog, id) -> {
-                    activity.applyEditNote(note);
+                    activity.updateNote(note);
                     Toast.makeText(getContext(), "노트가 수정되었습니다.", Toast.LENGTH_SHORT).show();
                     activity.originalOnBackPressed();
                 }).setNeutralButton("계속쓰기",

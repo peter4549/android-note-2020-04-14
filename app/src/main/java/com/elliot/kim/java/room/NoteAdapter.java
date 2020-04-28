@@ -2,6 +2,9 @@ package com.elliot.kim.java.room;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,12 +15,15 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.java.room.R;
 import com.android.java.room.databinding.CardViewBinding;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +32,7 @@ import java.util.List;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder>
         implements Filterable {
     private final Context context;
+
     private List<Note> noteList;
     private List<Note> noteListFiltered;
 
@@ -69,7 +76,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     public class NoteViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener{
-        CardViewBinding binding;
+        private CardViewBinding binding;
 
         NoteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,10 +99,18 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             MenuItem delete = menu.add(Menu.NONE, 1004, 4, "삭제하기");
             MenuItem share = menu.add(Menu.NONE, 1005, 5, "공유하기");
 
+            MenuItem done;
+            if (noteListFiltered.get(getAdapterPosition()).getIsDone()) {
+                done = menu.add(Menu.NONE, 1006, 6, "완료해제");
+            } else {
+                done = menu.add(Menu.NONE, 1006, 6, "완료체크");
+            }
+
             edit.setOnMenuItemClickListener(menuItemClickListener);
             setAlarm.setOnMenuItemClickListener(menuItemClickListener);
             delete.setOnMenuItemClickListener(menuItemClickListener);
             share.setOnMenuItemClickListener(menuItemClickListener);
+            done.setOnMenuItemClickListener(menuItemClickListener);
         }
 
         private final MenuItem.OnMenuItemClickListener menuItemClickListener = new MenuItem.OnMenuItemClickListener() {
@@ -110,15 +125,21 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).onAlarmFragmentStart(note);
                         break;
                     case 1003:
-                        ((MainActivity) context).cancelAlarm(note.getNumber());
-                        note.setAlarmSet(false);
+                        ((MainActivity) context).cancelAlarm(note);
                         break;
                     case 1004:
-                        ((MainActivity) context).deleteNote(note.getNumber());
-                        delete(getAdapterPosition());
+                        ((MainActivity) context).deleteNote(note);
+                        delete(note);
                         break;
                     case 1005:
                         share(note);
+                        break;
+                    case 1006:
+                        if (note.getIsDone())
+                            note.setIsDone(false);
+                        else
+                            note.setIsDone(true);
+                        ((MainActivity) context).updateNote(note);
                         break;
                 }
                 return true;
@@ -141,6 +162,23 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         holder.binding.textViewTitle.setText(note.getTitle());
         holder.binding.textViewDate.setText(note.getDateEdit());
 
+        if(note.getIsDone()) {
+            holder.binding.textViewTitle.setPaintFlags(holder.binding.textViewTitle.getPaintFlags() |
+                    Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.binding.textViewDate.setPaintFlags(holder.binding.textViewDate.getPaintFlags() |
+                    Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.binding.imageViewDone.setVisibility(View.VISIBLE);
+        } else {
+            holder.binding.textViewTitle.setPaintFlags(0);
+            holder.binding.textViewDate.setPaintFlags(0);
+            holder.binding.imageViewDone.setVisibility(View.INVISIBLE);
+        }
+
+        if(note.getAlarmSet())
+            holder.binding.imageViewAlarm.setVisibility(View.VISIBLE);
+        else
+            holder.binding.imageViewAlarm.setVisibility(View.INVISIBLE);
+
         holder.binding.cardView.setOnClickListener(v -> ((MainActivity) context).onEditNoteFragmentStart(note));
         holder.binding.cardView.setOnLongClickListener(v -> false);
     }
@@ -153,11 +191,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     void insert(Note note) {
         this.noteList.add(note);
         notifyItemInserted(this.noteList.size() - 1);
-    }
-
-    private void delete(int position) {
-        noteList.remove(position);
-        notifyItemRemoved(position);
     }
 
     void delete(Note note) {

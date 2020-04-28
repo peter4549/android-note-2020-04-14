@@ -80,6 +80,7 @@ public class AlarmFragment extends Fragment {
 
         binding.buttonSetDate.setOnClickListener(onClickListener);
         binding.buttonSetAlarm.setOnClickListener(onClickListener);
+        binding.imageViewExit.setOnClickListener(onClickListener);
 
         return binding.getRoot();
     }
@@ -88,19 +89,19 @@ public class AlarmFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MainActivity.isAlarmFragment = true;
+        MainActivity.fab.hide();
         isAlarmSet = note.getAlarmSet();
 
         if(isAlarmSet) {
             binding.textViewCurrentTimeSet.setVisibility(View.VISIBLE);
             binding.textViewCurrentTime.setVisibility(View.VISIBLE);
 
-            SharedPreferences preferences = getActivity().getSharedPreferences(
-                    "alarm_preferences",
-                    Context.MODE_PRIVATE);
-            Long what = preferences.getLong(note.getNumber()+"1", 0);
+            SharedPreferences preferences = Objects.requireNonNull(getActivity())
+                    .getSharedPreferences("alarm_preferences", Context.MODE_PRIVATE);
+            long prevAlarmTime = preferences.getLong(note.getNumber()+"1", 0);
             String pattern = "yyyy-MM-dd HH:mm:ss";
             SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-            String date = formatter.format(new Timestamp(what));
+            String date = formatter.format(new Timestamp(prevAlarmTime));
             binding.textViewCurrentTime.setText(date);
         } else {
             binding.textViewCurrentTimeSet.setVisibility(View.INVISIBLE);
@@ -113,6 +114,8 @@ public class AlarmFragment extends Fragment {
     public void onStop() {
         super.onStop();
         MainActivity.isAlarmFragment = false;
+        if (!MainActivity.isFragment)
+            MainActivity.fab.show();
     }
 
     public void setNote(Note note) {
@@ -149,6 +152,9 @@ public class AlarmFragment extends Fragment {
 
                     activity.originalOnBackPressed();
                     break;
+                case R.id.image_view_exit:
+                    activity.originalOnBackPressed();
+                    break;
             }
         }
 
@@ -172,7 +178,7 @@ public class AlarmFragment extends Fragment {
                     activity,
                     number,
                     intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_ONE_SHOT);
 
             AlarmManager alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
             if(alarmManager != null) {
@@ -198,7 +204,7 @@ public class AlarmFragment extends Fragment {
             saveAlarmPreferences(number, calendar.getTimeInMillis(), title, content);
 
             note.setAlarmSet(true);
-            activity.applyEditNote(note);
+            activity.updateNote(note);
 
             manager.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
