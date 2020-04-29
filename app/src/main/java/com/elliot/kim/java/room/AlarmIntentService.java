@@ -1,18 +1,12 @@
 package com.elliot.kim.java.room;
 
-import android.app.ActivityManager;
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.room.Room;
 
-import java.util.List;
-
 public class AlarmIntentService extends IntentService {
-    private final String packageName = "com.elliot.kim.java.room";
+    // private final String packageName = "com.elliot.kim.java.room";
 
     public AlarmIntentService() {
         super("AlarmIntentService");
@@ -36,9 +30,10 @@ public class AlarmIntentService extends IntentService {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "AlarmIntentService done", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "AlarmIntentService done", Toast.LENGTH_SHORT).show();
     }
 
+    /*
     public static boolean isAppRunning(final Context context, final String packageName) {
         final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final List<ActivityManager.RunningAppProcessInfo> processInfoList = activityManager.getRunningAppProcesses();
@@ -52,5 +47,6 @@ public class AlarmIntentService extends IntentService {
         }
         return false;
     }
+     */
 
 }

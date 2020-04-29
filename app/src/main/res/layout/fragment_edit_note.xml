@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -7,14 +7,17 @@
         android:layout_height="match_parent"
         tools:context="com.elliot.kim.java.room.MainActivity"
         android:orientation="vertical"
-        android:background="#ffffff"
-        android:weightSum="1" >
+        android:background="@color/colorPurplef3e5f5"
+        android:weightSum="1"
+        android:clickable="true"
+        android:id="@+id/edit_note_linear_layout">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorLightBlue50">
+            android:background="@color/colorPurplece93d8"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -30,24 +33,41 @@
                 android:id="@+id/text_view_date_add"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5" />
+                android:layout_weight="0.5"
+                android:background="@color/colorAmberfff8e1"
+                android:textColor="@color/colorBlueGrey263238"/>
 
             <TextView
                 android:id="@+id/text_view_date_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5" />
+                android:layout_weight="0.5"
+                android:background="@color/colorAmberfff8e1"
+                android:textColor="@color/colorBlueGrey263238"/>
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/edit_text_content_edit"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.90"
-            android:textSize="20sp"
-            android:gravity="top"
-            android:textColor="@color/colorBlueGreyDark"/>
+            android:layout_weight="0.90">
+
+            <EditText
+                android:id="@+id/edit_text_content_edit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="20sp"
+                android:gravity="top"
+                android:background="@color/colorAmberfff8e1"
+                android:textColor="@color/colorBlueGrey37464f"/>
+
+            <TextView
+                android:id="@+id/focus_block"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

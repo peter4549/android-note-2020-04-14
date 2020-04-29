@@ -3,23 +3,22 @@ package com.elliot.kim.java.room;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
@@ -34,6 +33,9 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    // References:
+    // https://stackoverflow.com/questions/43404557/clear-toolbar-menu-options-added-by-fragment-when-it-is-replaced
+
     private static boolean initialization;
     static boolean isFragment = false;
     static boolean isAlarmFragment = false;
@@ -58,28 +60,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(binding.toolBar);
-        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (!newText.isEmpty())
-                    adapter.getFilter().filter(newText);
-                return true;
-            }
-        });
-       animationController = AnimationUtils.loadLayoutAnimation(getApplicationContext(),
-                R.anim.layout_animation);
 
         initialization = true;
+        pressedTime = 0;
+
         editNoteFragment = new EditNoteFragment();
         addNoteFragment = new AddNoteFragment();
         alarmFragment = new AlarmFragment();
 
-        pressedTime = 0;
+        animationController = AnimationUtils.loadLayoutAnimation(getApplicationContext(),
+                R.anim.layout_animation);
 
         // https://themach.tistory.com/42
         if(viewModelFactory == null){
@@ -108,12 +98,8 @@ public class MainActivity extends AppCompatActivity {
                     initialization = false;
                 } else if (noteListSize < noteList.size()) {
                     adapter.insert(noteList.get(noteList.size() - 1));
-                    Note note = noteList.get(noteList.size() - 1);
-                    Toast.makeText(getApplicationContext(),
-                            "WAT"+note.getTitle()
-                            + note.getNumber() + ""
-                    ,Toast.LENGTH_LONG).show();
-                    //adapter.notifyItemInserted();
+                    adapter.notifyItemInserted(noteList.size() - 1);
+                    binding.recyclerView.setAdapter(adapter);
                 }
                 noteListSize = noteList.size();
             }
@@ -125,52 +111,47 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Intent intent = getIntent();
         String action = intent.getAction();
-        assert action != null;
-        if(action.equals("ALARM_ACTION")) {
-            int number = intent.getIntExtra("NUMBER", -1);
-            Toast.makeText(this,"AAAA", Toast.LENGTH_SHORT);
-            // why>?????
-            Log.d("NUM", number+"");
-            Log.d("content:::", viewModel.getNote(number).getContent());
-            onEditNoteFragmentStart(viewModel.getNote(number));
-            // 예외처리 필요. null반환시,숫자를 못찾을때,, 왜 ?? getNote가 일안함. 아닌가
-            //인덱스 잘못됫을 가능성도... 갑자기근데??, 그냥 다 인덱스 1이네 ㅅㅂ. 뭐냐.가
-            // 인덱스를 1만 던지고 있다.. 이런 시박
-            //
+        if (action != null) {
+            if (action.equals("ALARM_ACTION")) {
+                int number = intent.getIntExtra("NUMBER", -1);
+                onEditNoteFragmentStart(viewModel.getNote(number));
+            }
         }
     }
 
     public String getCurrentTime() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        return simpleDateFormat.format(date);
-    }
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초");
+        return simpleDateFormat.format(date);    }
 
     public void onEditNoteFragmentStart(Note note) {
         editNoteFragment.setEditNote(note);
-        getSupportFragmentManager().beginTransaction().addToBackStack(null)
-            .replace(R.id.container, editNoteFragment).commit();
+        getSupportFragmentManager().beginTransaction().
+                setCustomAnimations(R.anim.slide_in_top, R.anim.slide_in_bottom).
+                addToBackStack(null).
+                replace(R.id.container, editNoteFragment).commit();
     }
 
     public void onAddNoteFragmentStart() {
-        getSupportFragmentManager().beginTransaction()
-                //.setCustomAnimations(R.anim.anim_recycler_view)
-                .addToBackStack(null)
-                .replace(R.id.container, addNoteFragment).commit();
-
-
+        getSupportFragmentManager().beginTransaction().
+                setCustomAnimations(R.anim.slide_in_top, R.anim.slide_in_bottom).
+                addToBackStack(null).
+                replace(R.id.container, addNoteFragment).commit();
     }
 
     public void onAlarmFragmentStart(Note note) {
         alarmFragment.setNote(note);
-        getSupportFragmentManager().beginTransaction().addToBackStack(null)
-                .replace(R.id.container, alarmFragment).commit();
+        getSupportFragmentManager().beginTransaction().
+                addToBackStack(null).
+                setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_in_top).
+                replace(R.id.container, alarmFragment).commit();
     }
 
     public void deleteNote(Note note) {
         viewModel.delete(note.getNumber());
-        cancelAlarm(note);
+        cancelAlarm(note, true);
     }
 
     public void originalOnBackPressed() {
@@ -180,8 +161,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isFragment) {
-            if(AddNoteFragment.isContentEntered)
+            if(AddNoteFragment.isContentEntered) {
                 addNoteFragment.showCheckMessage();
+            }
             else if(EditNoteFragment.isContentChanged)
                 editNoteFragment.showCheckMessage();
             else
@@ -212,8 +194,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu) ;
-        return true ;
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        SearchView searchView = ((SearchView) menu.findItem(R.id.menu_search).getActionView());
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return true;
+            }
+        });
+
+        searchView.setOnSearchClickListener(v -> binding.imageViewLogo.setVisibility(View.GONE));
+
+        searchView.setOnCloseListener(() -> {
+            binding.imageViewLogo.setVisibility(View.VISIBLE);
+            return false;
+        });
+
+        searchView.setQueryHint("찾을 노트 제목을 입력해주세요.");
+
+        return true;
     }
 
     @Override
@@ -237,10 +242,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateNote(Note note) {
         viewModel.update(note);
-        adapter.notifyDataSetChanged();
+        adapter.notifyItemChanged(adapter.getPosition(note));
     }
 
-    public void cancelAlarm(Note note) {
+    public void cancelAlarm(Note note, boolean isDelete) {
         int number = note.getNumber();
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
@@ -256,11 +261,14 @@ public class MainActivity extends AppCompatActivity {
 
         removeAlarmPreferences(number);
 
-        note.setAlarmSet(false);
-        viewModel.update(note);
-        adapter.notifyDataSetChanged();
-
-        Toast.makeText(this, "알림이 해제되었습니다.", Toast.LENGTH_SHORT).show();
+        if (!isDelete) {
+            note.setAlarmSet(false);
+            viewModel.update(note);
+            adapter.notifyItemChanged(adapter.getPosition(note));
+            animationController = AnimationUtils.loadLayoutAnimation(getApplicationContext(),
+                    R.anim.layout_animation);
+            Toast.makeText(this, "알림이 해제되었습니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void removeAlarmPreferences(int number) {
@@ -293,9 +301,11 @@ public class MainActivity extends AppCompatActivity {
         adapter.share(note);
     }
 
+    /*
     public Note getNote(int number) {
         return viewModel.getNote(number);
     }
+     */
 
     /* Considered unnecessary function
     @Override

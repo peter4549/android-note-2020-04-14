@@ -2,6 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/menu_search"
+        android:title="search"
+        app:showAsAction="always"
+        android:icon="@android:drawable/ic_menu_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:defaultQueryHint="찾을 노트 제목을 입력해주세요."/>
+
     <item android:id="@+id/menu_add"
         android:title="노트추가"
         app:showAsAction="never" />

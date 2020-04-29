@@ -28,9 +28,11 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     // This method cannot be executed in the main thread.
-    public Note getNoteFromNumber(int number) {
+    /*
+    public Note getNoteByNumber(int number) {
         return database.dao().getNoteByNumber(number);
     }
+     */
 
     void insert(Note note) {
         new InsertAsyncTask(database.dao()).execute(note);

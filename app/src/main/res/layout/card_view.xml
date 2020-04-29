@@ -15,14 +15,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:background="@color/colorLime50"
         tools:context="com.elliot.kim.java.room.MainActivity">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/card_view"
             android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="64dp"
             card_view:cardCornerRadius="8dp"
             android:clickable="true"
             android:focusable="true"
@@ -32,19 +31,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@color/colorLime50">
+                android:background="@color/colorYellowfff176">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
                     android:orientation="horizontal"
-                    android:background="@color/colorCeruleanAlpha10">
+                    android:background="@color/colorYellowfff176">
 
                     <ImageView
                         android:id="@+id/image_view_logo"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/cat_footprint240" />
+                        android:layout_margin="4dp"
+                        android:src="@drawable/cat_64" />
 
                     <TextView
                         android:id="@+id/text_view_title"
@@ -63,7 +63,8 @@
                         android:layout_height="32dp"
                         android:src="@drawable/check_mark_green_240"
                         android:layout_toStartOf="@id/image_view_alarm"
-                        android:layout_margin="8dp"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginTop="6dp"
                         android:visibility="invisible"/>
 
                     <ImageView
@@ -71,7 +72,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_alignParentEnd="true"
-                        android:layout_margin="8dp"
+                        android:layout_margin="6dp"
                         android:src="@drawable/time_8c9eff_240"
                         android:visibility="invisible"/>
 
@@ -80,7 +81,7 @@
                 <TextView
                     android:id="@+id/text_view_date"
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="32dp"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@color/colorDeepPurple651fff" />

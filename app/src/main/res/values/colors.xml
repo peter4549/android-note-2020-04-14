@@ -13,4 +13,10 @@
     <color name="colorGrey606060Alpha80">#CC606060</color>
     <color name="colorBlueGrey263238">#263238</color>
     <color name="colorDeepPurple651fff">#651fff</color>
+    <color name="colorBlueGrey37464f">#37464f</color>
+    <color name="colorAmberfff8e1">#fff8e1</color>
+    <color name="colorYellowfff176">#fff176</color>
+    <color name="colorPurplece93d8">#ce93d8</color>
+    <color name="colorPurple4a148c">#4a148c</color>
+    <color name="colorPurplef3e5f5">#f3e5f5</color>
 </resources>

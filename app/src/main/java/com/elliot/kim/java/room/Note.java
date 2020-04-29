@@ -38,11 +38,13 @@ public class Note {
         return title;
     }
 
+    /*
     public void setTitle(String title) {
         this.title = title;
     }
+     */
 
-    public String getDateAdd() {
+    String getDateAdd() {
         return dateAdd;
     }
 
@@ -52,7 +54,7 @@ public class Note {
     }
      */
 
-    public String getDateEdit() {
+    String getDateEdit() {
         return dateEdit;
     }
 
@@ -76,19 +78,19 @@ public class Note {
         this.content = note;
     }
 
-    public Boolean getAlarmSet() {
+    Boolean getAlarmSet() {
         return isAlarmSet;
     }
 
-    public void setAlarmSet(Boolean alarmSet) {
+    void setAlarmSet(Boolean alarmSet) {
         isAlarmSet = alarmSet;
     }
 
-    public Boolean getIsDone() {
+    Boolean getIsDone() {
         return isDone;
     }
 
-    public void setIsDone(Boolean checked) {
+    void setIsDone(Boolean checked) {
         isDone = checked;
     }
 

@@ -1,5 +1,6 @@
 package com.elliot.kim.java.room;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
@@ -18,7 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +46,6 @@ public class AlarmFragment extends Fragment {
     private MainActivity activity;
     private FragmentAlarmBinding binding;
     private Note note;
-    private Boolean isAlarmSet;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -90,7 +89,7 @@ public class AlarmFragment extends Fragment {
         super.onResume();
         MainActivity.isAlarmFragment = true;
         MainActivity.fab.hide();
-        isAlarmSet = note.getAlarmSet();
+        Boolean isAlarmSet = note.getAlarmSet();
 
         if(isAlarmSet) {
             binding.textViewCurrentTimeSet.setVisibility(View.VISIBLE);
@@ -100,6 +99,7 @@ public class AlarmFragment extends Fragment {
                     .getSharedPreferences("alarm_preferences", Context.MODE_PRIVATE);
             long prevAlarmTime = preferences.getLong(note.getNumber()+"1", 0);
             String pattern = "yyyy-MM-dd HH:mm:ss";
+            @SuppressLint("SimpleDateFormat")
             SimpleDateFormat formatter = new SimpleDateFormat(pattern);
             String date = formatter.format(new Timestamp(prevAlarmTime));
             binding.textViewCurrentTime.setText(date);
@@ -219,8 +219,8 @@ public class AlarmFragment extends Fragment {
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog dialog = new DatePickerDialog(Objects.requireNonNull(getActivity()),
-                (view, year, month, dayOfMonth) -> binding.buttonSetDate.setText(String.format("%d년 %d월 %d일",
-                        year, month + 1, dayOfMonth)),
+                (view, year, month, dayOfMonth) -> binding.buttonSetDate.setText(String.
+                        format("%d년 %d월 %d일", year, month + 1, dayOfMonth)),
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));

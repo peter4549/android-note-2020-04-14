@@ -1,15 +1,19 @@
 package com.elliot.kim.java.room;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,16 +24,21 @@ import androidx.fragment.app.Fragment;
 import com.android.java.room.R;
 import com.android.java.room.databinding.FragmentEditNoteBinding;
 
+import java.util.Objects;
+
 public class EditNoteFragment extends Fragment {
     static boolean isContentChanged;
 
     private MainActivity activity;
+    private AlarmFragment alarmFragment;
     private FragmentEditNoteBinding binding;
     private AlertDialog.Builder builder;
     private Note note;
 
     private boolean isEditMode;
     private CharSequence charSequence;
+
+    private MenuItem editModeItem;
 
     void setEditNote(Note note) {
         this.note = note;
@@ -45,6 +54,7 @@ public class EditNoteFragment extends Fragment {
         isContentChanged = false;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,7 +63,9 @@ public class EditNoteFragment extends Fragment {
         setHasOptionsMenu(true);
         activity.setSupportActionBar(binding.toolBar);
         binding.toolBar.setTitle(note.getTitle());
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(activity.getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        alarmFragment = new AlarmFragment();
 
         binding.editTextContentEdit.addTextChangedListener(new TextWatcher() {
             @Override
@@ -64,8 +76,7 @@ public class EditNoteFragment extends Fragment {
             @Override
             public void onTextChanged (CharSequence s ,int start, int before, int count){
                 charSequence = s;
-                isContentChanged = !note.getContent()
-                        .equals(charSequence.toString());
+                isContentChanged = !note.getContent().equals(charSequence.toString());
             }
 
             @Override
@@ -73,6 +84,29 @@ public class EditNoteFragment extends Fragment {
 
             }
         });
+
+        binding.focusBlock.setOnTouchListener(new View.OnTouchListener() {
+
+            private GestureDetector gestureDetector = new GestureDetector(activity,
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onDoubleTap(MotionEvent e) {
+                            isEditMode = true;
+
+                            Toast.makeText(activity, "노트를 편집하세요.", Toast.LENGTH_SHORT).show();
+                            getFocus();
+
+                            return super.onDoubleTap(e);
+                        }
+                    });
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -90,6 +124,8 @@ public class EditNoteFragment extends Fragment {
         binding.textViewDateEdit.setText(dateEditText);
         binding.editTextContentEdit.setText(note.getContent());
         binding.editTextContentEdit.setEnabled(false);
+
+        binding.focusBlock.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -102,27 +138,54 @@ public class EditNoteFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_edit_note,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_edit_note, menu);
+        editModeItem = menu.findItem(R.id.menu_edit);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuDone = menu.findItem(R.id.menu_done);
+        MenuItem menuAlarm = menu.findItem(R.id.menu_alarm);
+        MenuItem menuChangeAlarm = menu.findItem(R.id.menu_change_alarm);
+
+        if (menuDone != null) {
+            if (note.getIsDone())
+                menuDone.setTitle("완료해제");
+            else
+                menuDone.setTitle("완료체크");
+        }
+
+        if (menuAlarm != null) {
+            if (note.getAlarmSet()) {
+                menuAlarm.setTitle("알림해제");
+                menuChangeAlarm.setVisible(true);
+            }
+            else {
+                menuAlarm.setTitle("알림설정");
+                menuChangeAlarm.setVisible(false);
+            }
+        }
+
+
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_done) {
-            if (note.getIsDone())
-                item.setTitle("완료해제");
-            else
-                item.setTitle("완료체크");
-        }
+
         switch (item.getItemId()) {
             case android.R.id.home:
+                AddNoteFragment.hideKeyboard(activity);
                 if (isContentChanged) {
                     showCheckMessage();
                 } else {
                     activity.originalOnBackPressed();
                 }
                 break;
-            case R.id.edit:
+            case R.id.menu_edit:
                 if (isEditMode) {
+                    binding.focusBlock.setVisibility(View.VISIBLE);
                     item.setIcon(R.drawable.pencil_039be5_240);
                     binding.editTextContentEdit.setEnabled(false);
                     if (isContentChanged) {
@@ -136,23 +199,29 @@ public class EditNoteFragment extends Fragment {
                         Toast.makeText(getContext(), "변경사항이 없습니다.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    item.setIcon(R.drawable.check_mark_green_240);
-                    binding.editTextContentEdit.setEnabled(true);
+                    getFocus();
                 }
                 isEditMode = !isEditMode;
                 break;
             case R.id.menu_alarm:
-                activity.onAlarmFragmentStart(note);
+                if(note.getAlarmSet())
+                    activity.cancelAlarm(note, false);
+                else
+                    onAlarmFragmentStartFromEditNote(note);
+                break;
+            case R.id.menu_change_alarm:
+                onAlarmFragmentStartFromEditNote(note);
                 break;
             case R.id.menu_share:
                 activity.share(note);
                 break;
             case R.id.menu_done:
-                if (note.getIsDone())
+                if (note.getIsDone()) {
                     note.setIsDone(false);
-                else
+                }
+                else {
                     note.setIsDone(true);
-
+                }
                 activity.updateNote(note);
                 break;
             case R.id.menu_delete:
@@ -177,7 +246,6 @@ public class EditNoteFragment extends Fragment {
                 (dialog, id) -> {
 
                 });
-
         builder.setNegativeButton("아니요",
                 (dialog, id) -> {
                     Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
@@ -185,5 +253,29 @@ public class EditNoteFragment extends Fragment {
                 });
         builder.create();
         builder.show();
+    }
+
+    private void showKeyboard(Context context) {
+        InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = ((MainActivity) context).getCurrentFocus();
+        if (view != null && manager != null)
+            manager.showSoftInput(view, 0);
+    }
+
+    private void getFocus() {
+        editModeItem.setIcon(R.drawable.check_mark_green_240);
+        binding.focusBlock.setVisibility(View.GONE);
+        binding.editTextContentEdit.setEnabled(true);
+        binding.editTextContentEdit.requestFocus();
+        binding.editTextContentEdit.setSelection(binding.editTextContentEdit.getText().length());
+        showKeyboard(activity);
+    }
+
+    private void onAlarmFragmentStartFromEditNote(Note note) {
+        alarmFragment.setNote(note);
+        activity.getSupportFragmentManager().beginTransaction().
+                addToBackStack(null).
+                setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_in_top).
+                replace(R.id.edit_note_linear_layout, alarmFragment).commit();
     }
 }

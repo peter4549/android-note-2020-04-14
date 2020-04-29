@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.elliot.kim.java.room.AddNoteFragment"
         android:orientation="vertical"
-        android:background="@color/colorLightBlue50" >
+        android:background="@color/colorPurplef3e5f5"
+        android:clickable="true">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorLightBlue50">
-
-        </androidx.appcompat.widget.Toolbar>
+            android:background="@color/colorPurplece93d8"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         <EditText
             android:id="@+id/editTextTitle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@id/tool_bar"
-            android:background="@color/colorAmber50"
-            android:hint="제목을 입력해주세요." />
+            android:background="@color/colorAmberfff8e1"
+            android:textColor="@color/colorBlueGrey263238"
+            android:hint="제목을 입력해주세요."
+            android:textColorHint="@color/colorBlueGrey37464f"/>
 
         <EditText
             android:id="@+id/editTextContent"
@@ -32,8 +34,10 @@
             android:layout_height="match_parent"
             android:layout_below="@id/editTextTitle"
             android:layout_marginTop="6dp"
-            android:background="@color/colorAmber50"
+            android:background="@color/colorAmberfff8e1"
+            android:textColor="@color/colorBlueGrey263238"
             android:hint="여기에 노트를 작성해주세요."
+            android:textColorHint="@color/colorBlueGrey37464f"
             android:gravity="top"/>
 
     </RelativeLayout>

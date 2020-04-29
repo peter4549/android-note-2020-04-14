@@ -45,7 +45,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setSmallIcon(R.drawable.time_8c9eff_240);
 
-            String channelName = "cat_note_channel";
+            String channelName = "dim_cat_note_channel";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             String description = "Notification channel for the Cat Note";
 

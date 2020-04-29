@@ -40,10 +40,10 @@ public class AddNoteFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_note,
                 container, false);
-        setHasOptionsMenu(true);
         activity.setSupportActionBar(binding.toolBar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolBar.setTitle("새 노트");
+        setHasOptionsMenu(true);
 
         isContentEntered = false;
 
@@ -80,12 +80,6 @@ public class AddNoteFragment extends Fragment {
         super.onStop();
         MainActivity.isFragment = false;
 
-        InputMethodManager manager = (InputMethodManager) activity
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (manager != null)
-            manager.hideSoftInputFromWindow(binding.editTextContent.getWindowToken(),
-                    0);
-
         isContentEntered = false;
 
         binding.editTextTitle.setText(null);
@@ -96,6 +90,8 @@ public class AddNoteFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         inflater.inflate(R.menu.menu_add_note, menu);
     }
 
@@ -103,19 +99,21 @@ public class AddNoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                hideKeyboard(activity);
                 if (isContentEntered)
                     showCheckMessage();
                 else {
-                    Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
                     activity.originalOnBackPressed();
                 }
                 break;
             case R.id.save:
+                hideKeyboard(activity);
                 if (isContentEntered) {
                     saveNote();
                     activity.originalOnBackPressed();
                 } else {
-                    Toast.makeText(getContext(), "저장되지 않았습니다.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, "저장되지 않았습니다.", Toast.LENGTH_LONG).show();
                     activity.originalOnBackPressed();
                 }
                 break;
@@ -158,5 +156,13 @@ public class AddNoteFragment extends Fragment {
                 });
         builder.create();
         builder.show();
+    }
+
+    static void hideKeyboard(Context context) {
+        InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = ((MainActivity) context).getCurrentFocus();
+
+        if (view != null && manager != null)
+            manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

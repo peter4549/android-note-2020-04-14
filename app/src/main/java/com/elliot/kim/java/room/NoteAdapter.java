@@ -3,8 +3,6 @@ package com.elliot.kim.java.room;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
-import android.text.SpannableString;
-import android.text.style.StrikethroughSpan;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,16 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.java.room.R;
 import com.android.java.room.databinding.CardViewBinding;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +62,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                noteListFiltered = (List<Note>)results.values;
+                noteListFiltered = (List<Note>) results.values;
                 notifyDataSetChanged();
             }
         };
@@ -87,10 +81,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             MenuItem edit = menu.add(Menu.NONE, 1001, 1, "노트펼치기");
-            MenuItem setAlarm, cancelAlarm;
+            MenuItem setAlarm;
             if (noteListFiltered.get(getAdapterPosition()).getAlarmSet()) {
                 setAlarm = menu.add(Menu.NONE, 1002, 2, "알림변경");
-                cancelAlarm = menu.add(Menu.NONE, 1003, 3, "알림삭제");
+                MenuItem cancelAlarm = menu.add(Menu.NONE, 1003, 3, "알림해제");
                 cancelAlarm.setOnMenuItemClickListener(menuItemClickListener);
             }
             else
@@ -116,7 +110,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         private final MenuItem.OnMenuItemClickListener menuItemClickListener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Note note = noteList.get(getAdapterPosition());
+                Note note = noteListFiltered.get(getAdapterPosition());
+
                 switch (item.getItemId()) {
                     case 1001:
                         ((MainActivity) context).onEditNoteFragmentStart(note);
@@ -125,7 +120,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).onAlarmFragmentStart(note);
                         break;
                     case 1003:
-                        ((MainActivity) context).cancelAlarm(note);
+                        ((MainActivity) context).cancelAlarm(note, false);
                         break;
                     case 1004:
                         ((MainActivity) context).deleteNote(note);
@@ -189,12 +184,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     }
 
     void insert(Note note) {
-        this.noteList.add(note);
-        notifyItemInserted(this.noteList.size() - 1);
+        noteList.add(note);
+        notifyItemInserted(noteList.size() - 1);
     }
 
     void delete(Note note) {
-        int position = noteList.indexOf(note);
+        int position = noteListFiltered.indexOf(note);
+        noteListFiltered.remove(position);
         noteList.remove(note);
         notifyItemRemoved(position);
     }
@@ -226,5 +222,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
         Intent chooser = Intent.createChooser(intent, "공유하기");
         context.startActivity(chooser);
+    }
+
+    int getPosition(Note note) {
+        return noteListFiltered.indexOf(note);
     }
 }

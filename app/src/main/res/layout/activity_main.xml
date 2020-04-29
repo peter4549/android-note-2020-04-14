@@ -8,24 +8,42 @@
         android:layout_height="match_parent"
         tools:context="com.elliot.kim.java.room.MainActivity"
         android:id="@+id/container"
-        android:background="@color/colorLightBlue50">
+        android:background="@color/colorPurplef3e5f5">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPurplece93d8"
             android:theme="@style/AppTheme.AppBarOverly"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/image_view_logo"
+                android:layout_width="144dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dip_cat_note_logo"
+                android:contentDescription="Application Logo" />
+
+                <!--
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:defaultQueryHint="찾을 노트 제목을 입력해주세요." />
+                app:defaultQueryHint="찾을 노트 제목을 입력해주세요."
+                android:layoutDirection="rtl"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" /> -->
+
+            </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -62,12 +80,14 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_action_button"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="32dp"
             android:src="@drawable/plus_ffffff_120"
-            app:fabCustomSize="64dp"
+            android:backgroundTint="@color/colorPurplece93d8"
+            app:borderWidth="0dp"
+            app:fabCustomSize="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:fabSize="auto" >
