@@ -1,4 +1,4 @@
-package com.elliot.java.room;
+package com.elliot.java.dimcatnote;
 
 import org.junit.Test;
 

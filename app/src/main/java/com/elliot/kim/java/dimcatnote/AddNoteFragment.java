@@ -1,4 +1,4 @@
-package com.elliot.kim.java.room;
+package com.elliot.kim.java.dimcatnote;
 
 import android.content.Context;
 import android.os.Bundle;

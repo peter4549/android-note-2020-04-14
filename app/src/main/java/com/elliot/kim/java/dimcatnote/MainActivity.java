@@ -1,4 +1,4 @@
-package com.elliot.kim.java.room;
+package com.elliot.kim.java.dimcatnote;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;

@@ -6,7 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.elliot.kim.java.room.AddNoteFragment"
+        tools:context="com.elliot.kim.java.dimcatnote.AddNoteFragment"
         android:orientation="vertical"
         android:background="@color/colorPurplef3e5f5"
         android:clickable="true">

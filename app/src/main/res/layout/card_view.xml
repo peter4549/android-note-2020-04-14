@@ -7,7 +7,7 @@
     <data>
         <variable
             name="note"
-            type="com.elliot.kim.java.room.Note" />
+            type="com.elliot.kim.java.dimcatnote.Note" />
     </data>
 
     <FrameLayout
@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        tools:context="com.elliot.kim.java.room.MainActivity">
+        tools:context="com.elliot.kim.java.dimcatnote.MainActivity">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/card_view"

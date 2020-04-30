@@ -1,6 +1,5 @@
-package com.elliot.kim.java.room;
+package com.elliot.kim.java.dimcatnote;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;

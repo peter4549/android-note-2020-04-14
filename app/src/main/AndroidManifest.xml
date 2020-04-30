@@ -14,12 +14,12 @@
         android:theme="@style/AppTheme">
 
         <service
-            android:name="com.elliot.kim.java.room.AlarmIntentService"
+            android:name="com.elliot.kim.java.dimcatnote.AlarmIntentService"
             android:process=":remote"
             android:exported="false" />
 
         <activity
-            android:name="com.elliot.kim.java.room.MainActivity"
+            android:name="com.elliot.kim.java.dimcatnote.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,13 +29,13 @@
         </activity>
 
         <receiver
-            android:name="com.elliot.kim.java.room.DeviceBootReceiver"
+            android:name="com.elliot.kim.java.dimcatnote.DeviceBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.elliot.kim.java.room.AlarmReceiver"></receiver>
+        <receiver android:name="com.elliot.kim.java.dimcatnote.AlarmReceiver"></receiver>
     </application>
 
 </manifest>
