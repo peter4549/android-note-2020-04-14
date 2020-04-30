@@ -5,7 +5,7 @@ current version: 1.0
 This is an application designed for personal study.
 
 Functions
-Add note
+\nAdd note
 Edit note
 Delete note
 Set alarm
