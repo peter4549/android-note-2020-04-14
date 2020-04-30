@@ -2,7 +2,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.elliot.kim.java.room.AlarmFragment"
@@ -62,12 +62,37 @@
                 android:textColor="@color/colorBlueGrey263238"
                 android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/button_set_date"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:paddingTop="12dp"/>
+                android:layout_margin="12dp"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:clickable="true">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="1dp"
+                    android:background="@color/colorYellowActionBar"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorBrown3e2723"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:text="날짜 선택"/>
+
+                <Button
+                    android:id="@+id/button_set_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:background="@color/colorLime50"
+                    android:textColor="@color/colorBlueGreyDark"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <TimePicker
                 style="@style/TimePickerTextColor"
@@ -79,13 +104,17 @@
 
             <Button
                 android:id="@+id/button_set_alarm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="6dp"
-                android:paddingBottom="12dp"
+                android:layout_margin="12dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:background="@color/colorLime50"
+                android:textColor="@color/colorBlueGreyDark"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:text="알림 등록" />
 
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </layout>

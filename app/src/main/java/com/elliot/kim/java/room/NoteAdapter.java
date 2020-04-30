@@ -90,15 +90,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             else
                 setAlarm = menu.add(Menu.NONE, 1002, 2, "알림설정");
 
-            MenuItem delete = menu.add(Menu.NONE, 1004, 4, "삭제하기");
-            MenuItem share = menu.add(Menu.NONE, 1005, 5, "공유하기");
+            MenuItem share = menu.add(Menu.NONE, 1004, 4, "공유하기");
 
             MenuItem done;
             if (noteListFiltered.get(getAdapterPosition()).getIsDone()) {
-                done = menu.add(Menu.NONE, 1006, 6, "완료해제");
+                done = menu.add(Menu.NONE, 1005, 5, "완료해제");
             } else {
-                done = menu.add(Menu.NONE, 1006, 6, "완료체크");
+                done = menu.add(Menu.NONE, 1005, 5, "완료체크");
             }
+
+            MenuItem delete = menu.add(Menu.NONE, 1006, 6, "삭제하기");
 
             edit.setOnMenuItemClickListener(menuItemClickListener);
             setAlarm.setOnMenuItemClickListener(menuItemClickListener);
@@ -123,18 +124,18 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                         ((MainActivity) context).cancelAlarm(note, false);
                         break;
                     case 1004:
-                        ((MainActivity) context).deleteNote(note);
-                        delete(note);
-                        break;
-                    case 1005:
                         share(note);
                         break;
-                    case 1006:
+                    case 1005:
                         if (note.getIsDone())
                             note.setIsDone(false);
                         else
                             note.setIsDone(true);
                         ((MainActivity) context).updateNote(note);
+                        break;
+                    case 1006:
+                        ((MainActivity) context).deleteNote(note);
+                        delete(note);
                         break;
                 }
                 return true;
@@ -154,18 +155,28 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, final int position) {
         Note note = noteListFiltered.get(position);
-        holder.binding.textViewTitle.setText(note.getTitle());
-        holder.binding.textViewDate.setText(note.getDateEdit());
+        String title = note.getTitle();
+        if (title.length() > 12)
+            title = title.substring(0, 12) + "...";
+        String date = note.getDateEdit();
+        if (date.equals(note.getDateAdd()))
+            date = "작성시간: " + date;
+        else
+            date = "수정시간: " + date;
+        holder.binding.textViewTitle.setText(title);
+        holder.binding.textViewDate.setText(date.substring(0, date.length() - 3));
 
         if(note.getIsDone()) {
             holder.binding.textViewTitle.setPaintFlags(holder.binding.textViewTitle.getPaintFlags() |
                     Paint.STRIKE_THRU_TEXT_FLAG);
             holder.binding.textViewDate.setPaintFlags(holder.binding.textViewDate.getPaintFlags() |
                     Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.binding.imageViewLogo.setImageResource(R.drawable.footprint);
             holder.binding.imageViewDone.setVisibility(View.VISIBLE);
         } else {
             holder.binding.textViewTitle.setPaintFlags(0);
             holder.binding.textViewDate.setPaintFlags(0);
+            holder.binding.imageViewLogo.setImageResource(R.drawable.cat_64);
             holder.binding.imageViewDone.setVisibility(View.INVISIBLE);
         }
 

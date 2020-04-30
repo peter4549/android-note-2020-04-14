@@ -123,8 +123,9 @@ public class MainActivity extends AppCompatActivity {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
         @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초");
-        return simpleDateFormat.format(date);    }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy. MM. dd. a hh:mm:ss");
+        return simpleDateFormat.format(date);
+    }
 
     public void onEditNoteFragmentStart(Note note) {
         editNoteFragment.setEditNote(note);
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     public void deleteNote(Note note) {
         viewModel.delete(note.getNumber());
         cancelAlarm(note, true);
+        Toast.makeText(this, "노트가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
     public void originalOnBackPressed() {
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isFragment) {
-            if(AddNoteFragment.isContentEntered) {
+            if(AddNoteFragment.isTitleEntered || AddNoteFragment.isContentEntered) {
                 addNoteFragment.showCheckMessage();
             }
             else if(EditNoteFragment.isContentChanged)

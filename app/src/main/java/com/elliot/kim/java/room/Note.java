@@ -13,6 +13,7 @@ public class Note {
     private String title;
     private String dateAdd;
     private String dateEdit;
+    private String dateAlarm;
     private String content;
     private Boolean isAlarmSet;
     private Boolean isDone;
@@ -60,6 +61,14 @@ public class Note {
 
     void setDateEdit(String dateEdit) {
         this.dateEdit = dateEdit;
+    }
+
+    String getDateAlarm() {
+        return dateAlarm;
+    }
+
+    void setDateAlarm(String dateAlarm) {
+        this.dateAlarm = dateAlarm;
     }
 
     public int getNumber() {

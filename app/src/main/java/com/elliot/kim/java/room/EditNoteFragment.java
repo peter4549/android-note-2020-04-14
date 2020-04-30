@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import java.util.Objects;
 
 public class EditNoteFragment extends Fragment {
     static boolean isContentChanged;
+    static TextView textViewDate;
 
     private MainActivity activity;
     private AlarmFragment alarmFragment;
@@ -64,6 +66,7 @@ public class EditNoteFragment extends Fragment {
         activity.setSupportActionBar(binding.toolBar);
         binding.toolBar.setTitle(note.getTitle());
         Objects.requireNonNull(activity.getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        textViewDate = binding.textViewDate;
 
         alarmFragment = new AlarmFragment();
 
@@ -90,12 +93,17 @@ public class EditNoteFragment extends Fragment {
             private GestureDetector gestureDetector = new GestureDetector(activity,
                     new GestureDetector.SimpleOnGestureListener() {
                         @Override
+                        public boolean onSingleTapUp(MotionEvent e) {
+                            Toast.makeText(activity, "더블탭하여 노트를 편집하세요.", Toast.LENGTH_SHORT).show();
+                            return super.onSingleTapUp(e);
+                        }
+
+                        @Override
                         public boolean onDoubleTap(MotionEvent e) {
                             isEditMode = true;
 
                             Toast.makeText(activity, "노트를 편집하세요.", Toast.LENGTH_SHORT).show();
                             getFocus();
-
                             return super.onDoubleTap(e);
                         }
                     });
@@ -106,7 +114,6 @@ public class EditNoteFragment extends Fragment {
                 return true;
             }
         });
-
         return binding.getRoot();
     }
 
@@ -117,13 +124,7 @@ public class EditNoteFragment extends Fragment {
         MainActivity.fab.hide();
         isEditMode = false;
 
-        String dateAddText = "최초 작성일: " + note.getDateAdd();
-        String dateEditText = "최근 수정일: " + note.getDateEdit();
-
-        binding.textViewDateAdd.setText(dateAddText);
-        binding.textViewDateEdit.setText(dateEditText);
-        binding.editTextContentEdit.setText(note.getContent());
-        binding.editTextContentEdit.setEnabled(false);
+        setText();
 
         binding.focusBlock.setVisibility(View.VISIBLE);
     }
@@ -204,10 +205,13 @@ public class EditNoteFragment extends Fragment {
                 isEditMode = !isEditMode;
                 break;
             case R.id.menu_alarm:
-                if(note.getAlarmSet())
+                if(note.getAlarmSet()) {
                     activity.cancelAlarm(note, false);
+                    setDateText(note);
+                }
                 else
                     onAlarmFragmentStartFromEditNote(note);
+
                 break;
             case R.id.menu_change_alarm:
                 onAlarmFragmentStartFromEditNote(note);
@@ -263,7 +267,7 @@ public class EditNoteFragment extends Fragment {
     }
 
     private void getFocus() {
-        editModeItem.setIcon(R.drawable.check_mark_green_240);
+        editModeItem.setIcon(R.drawable.check_mark_8c9eff_120);
         binding.focusBlock.setVisibility(View.GONE);
         binding.editTextContentEdit.setEnabled(true);
         binding.editTextContentEdit.requestFocus();
@@ -276,6 +280,24 @@ public class EditNoteFragment extends Fragment {
         activity.getSupportFragmentManager().beginTransaction().
                 addToBackStack(null).
                 setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_in_top).
-                replace(R.id.edit_note_linear_layout, alarmFragment).commit();
+                replace(R.id.edit_note_container, alarmFragment).commit();
+    }
+
+    private void setText() {
+        setDateText(note);
+        binding.editTextContentEdit.setText(note.getContent());
+        binding.editTextContentEdit.setEnabled(false);
+    }
+
+    static void setDateText(Note note) {
+        String date;
+        String dateAddText = "최초 작성일: " + note.getDateAdd();
+        String dateEditText = "최근 수정일: " + note.getDateEdit();
+        if (note.getAlarmSet())
+            date = dateAddText + "\n" + dateEditText + "\n알림시간: " + note.getDateAlarm();
+        else
+            date = dateAddText + "\n" + dateEditText;
+
+        textViewDate.setText(date);
     }
 }

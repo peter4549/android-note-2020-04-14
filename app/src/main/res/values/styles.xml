@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorControlHighlight">@color/colorPurplece93d8</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,8 +18,8 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TimePickerTextColor" parent="AppTheme">
-        <item name="android:textColorPrimary">@color/colorLime50</item>
-        <item name="android:textColor">@color/colorLime50</item>
+        <item name="android:textColorPrimary">@color/colorYellowfffde7</item>
+        <item name="android:textColor">@color/colorYellowfffde7</item>
     </style>
 
 </resources>

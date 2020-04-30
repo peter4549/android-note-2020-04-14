@@ -29,19 +29,8 @@
                 android:id="@+id/image_view_logo"
                 android:layout_width="144dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/dip_cat_note_logo"
+                android:src="@drawable/dip_cat_note_logo_translation_no_icon"
                 android:contentDescription="Application Logo" />
-
-                <!--
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/search_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:defaultQueryHint="찾을 노트 제목을 입력해주세요."
-                android:layoutDirection="rtl"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" /> -->
 
             </RelativeLayout>
 
@@ -73,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             android:layoutAnimation="@anim/layout_animation"/>

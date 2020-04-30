@@ -26,6 +26,7 @@ public class AddNoteFragment extends Fragment {
     private MainActivity activity;
     private FragmentAddNoteBinding binding;
     private AlertDialog.Builder builder;
+    static boolean isTitleEntered;
     static boolean isContentEntered;
 
     @Override
@@ -45,28 +46,48 @@ public class AddNoteFragment extends Fragment {
         binding.toolBar.setTitle("새 노트");
         setHasOptionsMenu(true);
 
+        isTitleEntered = false;
         isContentEntered = false;
 
-        binding.editTextContent.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged (CharSequence s,int start, int before, int count){
-                isContentEntered = count > 0;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        binding.editTextTitle.addTextChangedListener(titleTextWatcher);
+        binding.editTextContent.addTextChangedListener(contentTextWatcher);
 
         return binding.getRoot();
     }
+
+    private TextWatcher titleTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged (CharSequence s,int start, int before, int count){
+            isTitleEntered = count > 0;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
+    private TextWatcher contentTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged (CharSequence s,int start, int before, int count){
+            isContentEntered = count > 0;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 
     @Override
     public void onResume() {
@@ -100,7 +121,7 @@ public class AddNoteFragment extends Fragment {
         switch (item.getItemId()) {
             case android.R.id.home:
                 hideKeyboard(activity);
-                if (isContentEntered)
+                if (isContentEntered || isTitleEntered)
                     showCheckMessage();
                 else {
                     Toast.makeText(activity, "저장되지 않았습니다.", Toast.LENGTH_SHORT).show();
@@ -109,7 +130,7 @@ public class AddNoteFragment extends Fragment {
                 break;
             case R.id.save:
                 hideKeyboard(activity);
-                if (isContentEntered) {
+                if (isContentEntered || isTitleEntered) {
                     saveNote();
                     activity.originalOnBackPressed();
                 } else {

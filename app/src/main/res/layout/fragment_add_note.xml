@@ -23,10 +23,12 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@id/tool_bar"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:background="@color/colorAmberfff8e1"
             android:textColor="@color/colorBlueGrey263238"
             android:hint="제목을 입력해주세요."
-            android:textColorHint="@color/colorBlueGrey37464f"/>
+            android:textColorHint="@color/colorBrown3e2723"/>
 
         <EditText
             android:id="@+id/editTextContent"
@@ -34,10 +36,12 @@
             android:layout_height="match_parent"
             android:layout_below="@id/editTextTitle"
             android:layout_marginTop="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:background="@color/colorAmberfff8e1"
             android:textColor="@color/colorBlueGrey263238"
             android:hint="여기에 노트를 작성해주세요."
-            android:textColorHint="@color/colorBlueGrey37464f"
+            android:textColorHint="@color/colorBrown3e2723"
             android:gravity="top"/>
 
     </RelativeLayout>

@@ -31,7 +31,6 @@ import com.android.java.room.R;
 import com.android.java.room.databinding.FragmentAlarmBinding;
 
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,7 +52,7 @@ public class AlarmFragment extends Fragment {
         activity = (MainActivity) getActivity();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_alarm,
                 container, false);
-        setTimePickerTextColor(binding.timePicker, R.color.colorLightBlue50);
+        setTimePickerTextColor(binding.timePicker, R.color.colorYellowfffde7);
 
         Calendar calendar = new GregorianCalendar();
         Date currentTime = calendar.getTime();
@@ -94,20 +93,11 @@ public class AlarmFragment extends Fragment {
         if(isAlarmSet) {
             binding.textViewCurrentTimeSet.setVisibility(View.VISIBLE);
             binding.textViewCurrentTime.setVisibility(View.VISIBLE);
-
-            SharedPreferences preferences = Objects.requireNonNull(getActivity())
-                    .getSharedPreferences("alarm_preferences", Context.MODE_PRIVATE);
-            long prevAlarmTime = preferences.getLong(note.getNumber()+"1", 0);
-            String pattern = "yyyy-MM-dd HH:mm:ss";
-            @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-            String date = formatter.format(new Timestamp(prevAlarmTime));
-            binding.textViewCurrentTime.setText(date);
+            binding.textViewCurrentTime.setText(note.getDateAlarm());
         } else {
             binding.textViewCurrentTimeSet.setVisibility(View.INVISIBLE);
             binding.textViewCurrentTime.setVisibility(View.INVISIBLE);
         }
-
     }
 
     @Override
@@ -148,9 +138,16 @@ public class AlarmFragment extends Fragment {
 
                     Calendar calendar = new GregorianCalendar(year, month - 1, dayOfMonth,
                             hour, minute, 0);
-                    setAlarm(calendar);
 
-                    activity.originalOnBackPressed();
+                    if (System.currentTimeMillis() < calendar.getTimeInMillis()) {
+                        setAlarm(calendar);
+                        if (MainActivity.isFragment)
+                            EditNoteFragment.setDateText(note);
+                        activity.originalOnBackPressed();
+                    } else {
+                        Toast.makeText(activity, "이미 지니간 시간입니다.", Toast.LENGTH_SHORT).show();
+                    }
+
                     break;
                 case R.id.image_view_exit:
                     activity.originalOnBackPressed();
@@ -158,7 +155,7 @@ public class AlarmFragment extends Fragment {
             }
         }
 
-        private void setAlarm(Calendar calendar) {
+        private boolean setAlarm(Calendar calendar) {
             ComponentName receiver = new ComponentName(Objects.requireNonNull(getActivity()), DeviceBootReceiver.class);
             PackageManager manager = getActivity().getPackageManager();
             Intent intent = new Intent(getActivity(), AlarmReceiver.class);
@@ -192,7 +189,8 @@ public class AlarmFragment extends Fragment {
                             calendar.getTimeInMillis(),
                             pendingIntent);
                 }
-            }
+            } else
+                return false;
 
             /* Since set does not allow data duplication,
              data loss occurs when the title and content are the same.
@@ -203,6 +201,9 @@ public class AlarmFragment extends Fragment {
 
             saveAlarmPreferences(number, calendar.getTimeInMillis(), title, content);
 
+            String dateAlarm = new SimpleDateFormat("yyyy. MM. dd. a hh:mm:ss",
+                    Locale.getDefault()).format(calendar.getTime());
+            note.setDateAlarm(dateAlarm);
             note.setAlarmSet(true);
             activity.updateNote(note);
 
@@ -213,6 +214,7 @@ public class AlarmFragment extends Fragment {
             String text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ",
                     Locale.getDefault()).format(calendar.getTime());
             Toast.makeText(getContext(),text + "으로 알림이 설정되었습니다.", Toast.LENGTH_SHORT).show();
+            return true;
         }
     };
 
